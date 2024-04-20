@@ -1,0 +1,1476 @@
+{
+	"info": {
+		"_postman_id": "4c34dd45-ba70-44d4-acfd-04a4376e6e16",
+		"name": "multiauth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiMzUzZDE1N2I3OWFmNGEzMWM3MjZjNWQ3ZmNmNDEzNTA0MjlkNzU3ODk4YTI1YTRjOTJlMzUxNzRhOTZmNmM1NDc4NjUyNmNiYjczNzZkM2IiLCJpYXQiOjE3MTMzODg2MDguNDIyMTIyLCJuYmYiOjE3MTMzODg2MDguNDIyMTI2LCJleHAiOjE3NDQ5MjQ2MDguMTIyMTIyLCJzdWIiOiIyIiwic2NvcGVzIjpbInVzZXIiXX0.hKebbptLDzmOf2DxZuqXtepgOPhn7nyQXVEJ1y7gdIa08kjYQISZYJ5ewz_DSHxgtOfydVhVZG4eS_1zevCBt5VHQmZgPQ2IYIAwJN3uKwkYN_2RW3GOkugO7z4YFQ7Ozqixq1QCR5Ehciz254Sc5kTUJQnv94PBKn8rd7-3lVIOY7vfwhqD0cHGNcKGWg_TxD82eZOaTDs25agKIzwkxaA4q5kKQ2_cTr_cBwBn1NdD2d_S0rTwCTaiOf-Wu6OUl7VbdvUGNAlKvvi0-r5hlXCnxIjDt2PLqpA0-N8cngMeoXe3-TsLfulBBCd1yiL0NE-h2GjuJ3BDOVHV9536Sn2mYAUViol8sgMpFl2J6XHBTZehsSEcuVsLgAnkPSNunMsSgFVBCgNgcB5JG8l-4Nd9yZ3DrHXaHxRXz1hLGrePLNRHW1sC2PzAvrERwT98c4OAyrRsj9gkM_HYdP5SgP-j8ZPXR4mxg7irsKvwerVpuP9g3Qt814N7yzaFr52ODG3WKOn65or-51fUBisQewZwG1Gi84w4PutZlL3sZmD0rhZJpIMNslAscHs_LoxukngeGpT12wx_fVM9Z-2TfAxwAUPYb3bRV1syN0P-hkEBfroQynqhXRqn9KVhUTdlNw689jzDn8nahUn5D0G0bvO9JIhdo-6Z_leNcGXUjiI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "safa",
+									"type": "default"
+								},
+								{
+									"key": "email",
+									"value": "jhjk@gmahj",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "11@#qwQW",
+									"type": "default"
+								},
+								{
+									"key": "description_company",
+									"value": "yui",
+									"type": "default"
+								},
+								{
+									"key": "type",
+									"value": "jhj",
+									"type": "default"
+								},
+								{
+									"key": "company_website",
+									"value": "uuyuy",
+									"type": "default"
+								},
+								{
+									"key": "image",
+									"value": "lkg;.png",
+									"type": "default"
+								},
+								{
+									"key": "password_confirmation",
+									"value": "11@#qwQW",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/admin/register",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"admin",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "jhjk@gmahjnhnhjhjjhklk",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "11@#qwQW",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/admin/Login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"admin",
+								"Login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZWUxYzEzNGNkZjU5MzFhN2I0ODNjOWM1N2UwYzEzNTViODZjOTBiY2M4NzdhMGJjZWFhMDhjOGI5ZjAxZDkyMWFhNTNiZDBhYWZmYjk4MDIiLCJpYXQiOjE3MTM0Njg2MzguOTk1MTc1LCJuYmYiOjE3MTM0Njg2MzguOTk1MTc5LCJleHAiOjE3NDUwMDQ2MzguOTg5NzY3LCJzdWIiOiI0Iiwic2NvcGVzIjpbImFkbWluIl19.XKidzt2WSZNdPKgWbCzVlvyv99DJMuOjHnwYptjo7qm55ZGGKRKMNWnfC7GlDDlY-dvIMwFre5U4aZK2IEfMh3kW503edcV6LumdZ9JqXnWYs7pHrVVeR2nlTbl4P2WeZaTGUraA6PkIUQ1Iu3XDC1RJr-NhmvNe4UhILl5aZ_ZB5SLpMS7EXw8Dgt1HKWYej-viGgSiqAC3_ygzkthcY-O8PYKMb7X6G4UnSZcsYzRU_Dfnh-3YILGDlhs9RjiDoflLAdd45eb42r8d-hngwc4FOD3Wi7RTkIrxKJGtvuAJgYxeykP1CLulGLc4dgoWeeT4bA8_4G5KPIvu6_4y3eEPD0hA18wWVpiCYq4PJFap5kXwt1fszySzkQCq066MLmtarEVKG2ybOx2YNCfY4_ZgRfTW3An0TsG_-lzGCo75HjItem7Gcpb5Hg3CsCGr8f05_w5utaw5Dl9i87ERt2hVxzSKqfU1Y3YG_MjlOd1462ko_SKVbYcNC7c_BLN1C8f0yiyK7MekoAUJTJjxCJHRwXTpA5cZWJopuoRmWM8YRojcpdFabLeqzzVLGUqZMoFrDhW6z95JFc7nD-FMCKzVJ_M9915zrPCXF3AnV7VkGzPJOgceXEa-kq0RJwtNZY2fP81e2DQ-PWi04zelH_QDKGxAdyPptnoj1teqd0s",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/admin/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"admin",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "bd",
+									"type": "default"
+								},
+								{
+									"key": "email",
+									"value": "hg@com",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "123@@$$Asd",
+									"type": "default"
+								},
+								{
+									"key": "password_confirmation",
+									"value": "123@@$$Asd",
+									"type": "default"
+								},
+								{
+									"key": "phone_number",
+									"value": "0987654312",
+									"type": "default"
+								},
+								{
+									"key": "age",
+									"value": "67",
+									"type": "default"
+								},
+								{
+									"key": "nationality",
+									"value": "jhk",
+									"type": "default"
+								},
+								{
+									"key": "gender",
+									"value": "famel",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user/register",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Admin",
+											"type": "default"
+										},
+										{
+											"key": "email",
+											"value": "Ammar@gmail.com",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "phone_number",
+											"value": "0985465640",
+											"type": "default"
+										},
+										{
+											"key": "age",
+											"value": "45",
+											"type": "default"
+										},
+										{
+											"key": "nationality",
+											"value": "hgf",
+											"type": "default"
+										},
+										{
+											"key": "gender",
+											"value": "fkdg",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:37:35 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:37:35 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"user\": {\n        \"name\": \"Admin\",\n        \"email\": \"Ammar@gmail.com\",\n        \"phone_number\": \"0985465640\",\n        \"age\": \"45\",\n        \"nationality\": \"hgf\",\n        \"gender\": \"fkdg\",\n        \"updated_at\": \"2024-04-19T19:37:35.000000Z\",\n        \"created_at\": \"2024-04-19T19:37:35.000000Z\",\n        \"id\": 6\n    },\n    \"access_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiN2JhNmY2ZWUyODVmMjE5N2I5N2NhNjIxNjUwYTdmZWI2MTgyZWZhY2I1NjdmYjE1MDU0ZDk0ODJjZGM1NTQzOTIwYWJhODAxMDBmNTM1ZmUiLCJpYXQiOjE3MTM1NTU0NTUuMDk4MTI3LCJuYmYiOjE3MTM1NTU0NTUuMDk4MTI5LCJleHAiOjE3NDUwOTE0NTUuMDkxOTk3LCJzdWIiOiI2Iiwic2NvcGVzIjpbInVzZXIiXX0.cfy1OUbbjsHp4bqqlyTc7oOsoem6gr39h6xlwdN978Bx5ECKGWUzaOsA5sbZd50ZJPHl0K5gecr4LVjAyUJrBfqBt6fK_Zncu4DYDUG0BZTM0Vrw2n6LxG27J_2X0xargDYQmNvhYI0vuAihC0gFbLCtTXk7-WveLNWb1mqSTnOUTLWyBKYv-g0WMRuW7NbCO8Shj_iDdbkzBeDRuOdfAPAF3qbKeDgmGHoIB6oaT_NiI0I73Z2pM1MnGYbeZAfPU0JgOeMA6ysqNTTDh-nNpZdd8MOCDvqgLl_y9ggvN_yiQmEXlsc9PA5z7jn4lJSLt3wUqLu-9StQrgAXQenHJTeMInL_hVNfPMUdt3MfEUAya4JlN-SU9Q_lhDSNFeSslSnvtfxgJ4bqZFj20R1Sz1DPk5EHPhcQrh85Ap9_uUqIg9itT3Y8cHFZ9exSmcmZrFcKw6IxAcMy164GYCH-3cv0PqDGlogLXulTmLV6oANdCDKn__PJNICrrONks2Nkv_U8r3zGPWgsULum2Xz3qqFHdiRJfyQPJEDuojdQ6-_ADGV41_5a4cglUFVW30czR3jvm42J1PO3Iv0WpnYVmqnwNt0pZBwFPUGrXBbA9UiYlrqQs5Gca1DbP8CJ9sVDb4CPSgVWYX950PdxbCWDliraj6CazBZzLNZYf4wg1XI\"\n}"
+						},
+						{
+							"name": "mobile 10",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Hiba",
+											"type": "default"
+										},
+										{
+											"key": "email",
+											"value": "Hiba@gmail.com",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "phone_number",
+											"value": "098546564",
+											"type": "default"
+										},
+										{
+											"key": "age",
+											"value": "45",
+											"type": "default"
+										},
+										{
+											"key": "nationality",
+											"value": "hgf",
+											"type": "default"
+										},
+										{
+											"key": "gender",
+											"value": "fkdg",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "Unprocessable Content",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:41:50 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:41:50 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"The phone number field must be 10 digits.\",\n    \"errors\": {\n        \"phone_number\": [\n            \"The phone number field must be 10 digits.\"\n        ]\n    }\n}"
+						},
+						{
+							"name": "email unique",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Hiba",
+											"type": "default"
+										},
+										{
+											"key": "email",
+											"value": "Hiba@gmail.com",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "phone_number",
+											"value": "0985465648",
+											"type": "default"
+										},
+										{
+											"key": "age",
+											"value": "45",
+											"type": "default"
+										},
+										{
+											"key": "nationality",
+											"value": "hgf",
+											"type": "default"
+										},
+										{
+											"key": "gender",
+											"value": "fkdg",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "Unprocessable Content",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:43:04 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:43:04 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"The email has already been taken.\",\n    \"errors\": {\n        \"email\": [\n            \"The email has already been taken.\"\n        ]\n    }\n}"
+						},
+						{
+							"name": "mobile unique",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Hiba",
+											"type": "default"
+										},
+										{
+											"key": "email",
+											"value": "Hiba@gmail.comj8",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										},
+										{
+											"key": "phone_number",
+											"value": "0985465648",
+											"type": "default"
+										},
+										{
+											"key": "age",
+											"value": "45",
+											"type": "default"
+										},
+										{
+											"key": "nationality",
+											"value": "hgf",
+											"type": "default"
+										},
+										{
+											"key": "gender",
+											"value": "fkdg",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "Unprocessable Content",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:44:12 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:44:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"The phone number has already been taken.\",\n    \"errors\": {\n        \"phone_number\": [\n            \"The phone number has already been taken.\"\n        ]\n    }\n}"
+						},
+						{
+							"name": "password not true",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Hiba",
+											"type": "default"
+										},
+										{
+											"key": "email",
+											"value": "Hiba@gmail.comj8",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "1234",
+											"type": "default"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "1234",
+											"type": "default"
+										},
+										{
+											"key": "phone_number",
+											"value": "0985465644",
+											"type": "default"
+										},
+										{
+											"key": "age",
+											"value": "45",
+											"type": "default"
+										},
+										{
+											"key": "nationality",
+											"value": "hgf",
+											"type": "default"
+										},
+										{
+											"key": "gender",
+											"value": "fkdg",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "Unprocessable Content",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:45:33 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:45:33 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"The password field must be at least 8 characters. (and 2 more errors)\",\n    \"errors\": {\n        \"password\": [\n            \"The password field must be at least 8 characters.\",\n            \"The password field must contain at least one uppercase and one lowercase letter.\",\n            \"The password field must contain at least one symbol.\"\n        ]\n    }\n}"
+						},
+						{
+							"name": "required",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/register",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "Unprocessable Content",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 20 Apr 2024 09:42:41 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 20 Apr 2024 09:42:41 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"The name field is required. (and 6 more errors)\",\n    \"errors\": {\n        \"name\": [\n            \"The name field is required.\"\n        ],\n        \"email\": [\n            \"The email field is required.\"\n        ],\n        \"password\": [\n            \"The password field is required.\"\n        ],\n        \"phone_number\": [\n            \"The phone number field is required.\"\n        ],\n        \"age\": [\n            \"The age field is required.\"\n        ],\n        \"nationality\": [\n            \"The nationality field is required.\"\n        ],\n        \"gender\": [\n            \"The gender field is required.\"\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "login",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNzk0ODk5MzQ2NTVkMDI0MDE3NGY0ZGI5NmUzNjM0ZmI1Mzg5MjA4ZTgwY2U0OTYwNGI1MGJiZmI4Zjg2Zjc4MjNjMWMwNTYwZjc1YzY1NDMiLCJpYXQiOjE3MTM1NTIwMzcuODg0NjYsIm5iZiI6MTcxMzU1MjAzNy44ODQ2NjQsImV4cCI6MTc0NTA4ODAzNy44NzU0NDksInN1YiI6IjUiLCJzY29wZXMiOlsidXNlciJdfQ.pRjNBUynY3E9huQRc6MDiyrnvJoq1hUWB5fm6c0Gc9TjCagYMNd4jZvO2BAs4faxlNv1n8zfpsEqKK8KtDvj-s2WmDfJEBPtKXjUzD0ucIC2ChvmDReBrjR5ri_ISdGsGs_y7rcSv_OfacaLbMydkU-6QPvAZtluaOf5BdbXPPsWk53SDEWR23DkX2Z0_EqqW8fUbXng-iEqnxpRuM73XEtElDwI7aEXoDiG3qf8tPTzT1Uvp6emZco5VO_fHKTQxAAYKqGZ1pjBrkGZLH1MvVMiC9Mc4E2m7uiYy8wKlj6SKaRPmnBj5PTzpusgep0_4kesSmAOAviIJuXQP8gEGmVuMhsCkwC0Gq15VyPJZYQT6bEp5G5GHVK1C3jfw40syCVzYg8VKgpYyGjVQksWYzjh8xVEsk38P50I-7T8szLYuFFoadFm-oKm4vwsBx9zip7LuZ3MbsmuQLXLX19AO-lUtLg1WKU4F9s2nrImextxFjIIPtGn1FPK5E2N2Rf598jHcYt34ZucADsOKcTKVxj-ri9uUQQ4yyRxFM8QDssCA_FXrfnWeY79GnGpZ1JNbezHKx3OvwPKe2QSsiJj9NovfOrj-nYgDvxuyqDYZiG5InVBBDrDKROWoNu20dgfc7BTAOdjwjJDkPnbSu823om-HsvW6oUlutQUPxpSmzY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "hg@com",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "123@@$$Asd",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user/Login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"Login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "loginAdmin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "Ammar@gmail.com",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "tftfdtf@@WW129",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/Login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"Login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:39:13 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:39:13 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 6,\n    \"name\": \"Admin\",\n    \"email\": \"Ammar@gmail.com\",\n    \"email_verified_at\": null,\n    \"phone_number\": \"0985465640\",\n    \"image\": null,\n    \"age\": \"45\",\n    \"gender\": \"fkdg\",\n    \"nationality\": \"hgf\",\n    \"created_at\": \"2024-04-19T19:37:35.000000Z\",\n    \"updated_at\": \"2024-04-19T19:37:35.000000Z\",\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNGM4YzAxNTk1NmUwY2RkZWJmMGNlNDdiNmViNGJmOTIyY2NhYjdjMjQ1MDcyNmE5YzhmMzY3ODdkMGMxZTY4OGZkNDBiZmVkMjE2OTg0NzAiLCJpYXQiOjE3MTM1NTU1NTMuNDA2NzY4LCJuYmYiOjE3MTM1NTU1NTMuNDA2NzcxLCJleHAiOjE3NDUwOTE1NTMuMzkwNDE5LCJzdWIiOiI2Iiwic2NvcGVzIjpbInVzZXIiXX0.TNUIvoGZcsBZKSEVHPE4CtrWRECt4XI7xZco01XIlZdYkSMGvs5PdsRMH_M5eKXYmdsfv_IGu124C_cC6MtuQxrUigjC4U5qnSbUb7Vv3z0Cv6DoAR3LRQsoOj2RkYWscumMLAiUU0C3gW7IoAXkQQHwhn1NKFr_M3ExjcbbFuqpbwLJ_247lq7d_XueQed4lKeP55ybm6Rayaj2fsdKDnWYGvg_XGCaS1FP5tPWQokX-Pm3L12-t6DINI-oKnWn6C0obArcrVw176QYyDvjQBhkKxMeSlqzgIiyOPaXWB8tPTrnPSyNQMq5Avf5nbmLtVzjRoduQvKLbSgZHyuQCYmxhsJp7jzXSFibg2xzQ03nIIrUIZ_guXEpTMez3P0aS7XvhiR2tmjwjanvjqPer6DMBgjMV9GsxET43u37xIizyw2Hja9vL1y--O_rl758JHeo9VJ162lsPpL6YToPNzfDl5ZROw8LY1L9b1oqXjUw8RXqKJ73vea3eaKR_TJZETkKRFjUhrJ_Y7EZXRnn_JPDJQwvZ17PqMWuoTm3zK7Ss7pvX2ATT-lp-S1wNGb8rbPNdjTCW5b8S5_es0YnnPCC-M-rPMYq5amThlbOhdC64AzjRRjoG5xtY5B0ubHowybeazp1w608GK-g5PjhRedcJ0NU0QRAJunWyIpwDJ4\"\n}"
+						},
+						{
+							"name": "password or email wrong",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "Ammar@gmail.com",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "tftfdtf@@WW12",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/Login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"Login"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:39:52 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 19:39:52 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": [\n        \"Unauthorized\"\n    ]\n}"
+						},
+						{
+							"name": "loginsuccess",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "hg@com",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "123@@$$Asd",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/Login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"Login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 20 Apr 2024 10:26:35 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 20 Apr 2024 10:26:35 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 11,\n    \"name\": \"bd\",\n    \"email\": \"hg@com\",\n    \"email_verified_at\": null,\n    \"phone_number\": \"0987654312\",\n    \"image\": null,\n    \"age\": \"67\",\n    \"gender\": \"famel\",\n    \"nationality\": \"jhk\",\n    \"created_at\": \"2024-04-20T10:25:49.000000Z\",\n    \"updated_at\": \"2024-04-20T10:25:49.000000Z\",\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiMDI2Y2U4OTYyM2QxNTgwY2NjN2YwNmU2ODAzNzdhNmI5ZDE2MjZmMzk5ZjFiZmM5MWNmNDdhNTRmOTVmMmMyMTI0NWVhZWQ5OWNhMzVmMDYiLCJpYXQiOjE3MTM2MDg3OTQuOTg5NTc2LCJuYmYiOjE3MTM2MDg3OTQuOTg5NTgyLCJleHAiOjE3NDUxNDQ3OTQuOTQxODA1LCJzdWIiOiIxMSIsInNjb3BlcyI6WyJ1c2VyIl19.jmGTvElikjvyUH5lwk_vw8TykqQ2J1G6_GRR1Wb13ATqYP7NGdJ7dLSW8V9Oof9WSimNQkgIRM_tdKKQforks69EvBe6825-LRFktC8xO0QKiGujd_-acIASTObSmhTuwAQomK3NMqEX5j4E_N8hfh91iLayRcndqBtP4aXp5jACind89KwfEDcGm8m0WbEuvZPXNsH2pFg_gveFCoE5RfEt4r3iknoGkaOSrYIC3fIF8XKpGQP9EGFWZ3tnlVlhNdws7w3yHAexgC2byave2q3twXdXtmp8UNW-czAQKHQySvkn6onzNoSPXQ-V663JynHdy23guLKQfpYCgrWw3mUUYAChqDWVmCyyCqGhxACbEzRs8Hqex72TQ_ZUBYNY2r8SuLNy0GNw9w4_a4IlytAkxaH-L0y_ZYs-FZ09owJDVlU82QHgB7gSivwp53QE-M1tphlV9gC7n7nLe5bmzHrMac8wXlyaB1wSaTFz6YDI4_cd9Sj39qa0KJClSNUfm_3rGXMaBeQsSTUn-8EH2sRqGPtGQUaVFpGqXDUEytjiRs0oKXdh5qBPWkXW_X_3_-ZfI5EaPpybVcEpf-uVSfmRhvSWf5VsGLJFA5wXhRiXS6XsSKddyCC8vD9CCTXbAcQG6utjY92kcsp3cBnnxG7bXtTbxI1J3LI7PUzK-gE\"\n}"
+						}
+					]
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiMjJhNGE5YzJkYzdlNjU3OTdmOWY4NTliZjQ5MmQ3MjlkN2MyZTE5ZTI2NGY5NDlhM2MyYzY3MDVkNmI1MGYzYjVlMWVjZTkyYjgwN2M0M2QiLCJpYXQiOjE3MTM2MDUwMjguNzY4MTU5LCJuYmYiOjE3MTM2MDUwMjguNzY4MTYzLCJleHAiOjE3NDUxNDEwMjguNzIyMTk5LCJzdWIiOiIxMCIsInNjb3BlcyI6WyJ1c2VyIl19.EX0EdJeb1ygUtKXEcujhCdBnuO0yWoYtEFDWzI2RpUmdV6CXEZaYKdRKxg2p1D5Ua0xtVNSZB2aKd4wEDlShDCZVaEwyH5BQ9CxZxUl8bCi8ku3O-kj3hrwnR6z4Q4KfrBIXq_ehnbRjAK3iaZPAlwBNyyTCAOtNYvAIzCSxhVcfnzWV4ZvbiOgdapB9qd6BcYD-IW9pOUAhiRpHnSOMJ5m3WfwqIhCGoip41clXwfeDv9BYd3z71gQJ80kj2ZxQXTs9imolBPdOx9cgkXWmLXi5VicOz5Lj5V9C-NvWESX-2a9HRNUeQvsy8NzcPDn29s5iAVnutRPxdApaFiGOb20mrJ4T7AWS5D87tAB11tO5MVuc7xhxMiJK78KdMRP-SIzEOGfMwi52-oRiqZIvpGdhQ3uCDcVsOxhFV8TBcfqCQVXbo34nsAuKuUNgL0A2lpiub-hH71wnSFXih93T2A69D5-3U7J7vuVMTBdlKU-1jvW4zy5V3FffnGi99PcEWFb19VvMvWuujyXxXFykRAL16OI6QIWKkW7t1XoofUZUzVqrsRsqTmmBFICzJgb28itkySUa6lQYkqmU0J_pFuhhHgr1LPHRFOsiiGpH5AuZ1E_EGhs6aOJIoOk4hweKRfvSAo8Po4YxgGoe5vq53oO8cfLxbSy9tXtRQGtoqU4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"logout"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "logoutFaild",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/logout",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"logout"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 20:52:10 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 19 Apr 2024 20:52:10 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Unauthenticated.\"\n}"
+						},
+						{
+							"name": "logoutsuccess",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/user/logout",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"user",
+										"logout"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Host",
+									"value": "127.0.0.1:8000"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 20 Apr 2024 09:24:18 GMT"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 20 Apr 2024 09:24:18 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.1.6"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": \"logged out successfully\"\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}
