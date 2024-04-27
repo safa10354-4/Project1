@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\User;
+use App\Models\wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +18,7 @@ class AuthenController extends Controller
             'name' => ['required', 'max:55', 'string'],
             'email' => ['email', 'required', 'unique:users'],
             'password' => ['required','confirmed', Password::defaults()],
-          //  'phone_number' =>  ['required'],
+
             'phone_number'=>['required','unique:users,phone_number','digits:10'],
             'age' =>  ['required'],
             'nationality' =>['required'] ,
@@ -25,21 +26,38 @@ class AuthenController extends Controller
         ]);
 
         $user = \App\Models\User::query()->create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'phone_number' => $request->phone_number,
-            'age' => $request->age,
-            'nationality' => $request->nationality,
-            'gender' => $request->gender,
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => bcrypt($request['password']),
+            'phone_number' => $request['phone_number'],
+            'age' => $request['age'],
+            'nationality' => $request['nationality'],
+            'gender' => $request['gender'],
         ]);
         $accessToken = $user->createToken('MyApp',['user'])->accessToken;
+
+
+
+        //Create the wallet for the user
+
+
+        $wallet = new Wallet();
+      $wallet['user_id'] = $user['id'];
+      $wallet['balance'] = 0;
+       $wallet->save();
+
+
+
 
         return response([
             'user' => $user,
             'access_token' => $accessToken
         ]);
+
 }
+
+
+//*********************************************************************************************
     public function userLogin(Request $request)
     {
         $request->validate([
@@ -63,11 +81,20 @@ class AuthenController extends Controller
             return response()->json(['error' => ['Unauthorized']], 401);
         }}
 
+
+    //*******************************************************************************************************
+
         public function userLogout()
     {
             Auth::guard('user-api')->user()->token()->revoke();
             return response()->json(['success'=>'logged out successfully']);
     }
+
+
+
+    //========================================================================================================================
+
+
 
     public function adminRegister(Request $request)
     {
@@ -97,12 +124,9 @@ class AuthenController extends Controller
         if ($request->hasFile('image')) {
 
             $imagePath = $request->file('image')->store('images');
-
-
             return response()->json(['message' => 'تم تحميل الصورة بنجاح', 'image_path' => $imagePath,   'admin' => $admin,
                 'access_token' => $accessToken], 200);
         } else {
-            // إذا لم يتم إرفاق ملف صورة في الطلب
             return response()->json(['message' => 'الرجاء إرفاق ملف صورة'], 400);
         }}
 

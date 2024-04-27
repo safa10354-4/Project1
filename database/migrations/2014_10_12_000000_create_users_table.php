@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
@@ -17,13 +17,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            //$table->string('confirm_password');
+
             $table->string('phone_number')->unique();
-            $table->string('image')->nullable();;
-            $table->string('age');
+            $table->string('image')->nullable();
+            $table->bigInteger('age');
             $table->string('gender');
             $table->string('nationality');
+            //$table->softDeletes();
             $table->rememberToken();
+            $table->bigInteger('points')->default(0);
             $table->timestamps();
         });
     }
@@ -31,7 +33,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('users');
     }

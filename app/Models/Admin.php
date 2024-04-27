@@ -8,9 +8,11 @@ use Laravel\Passport\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 //use Illuminate\Foundation\Auth\Admin as Authenticatable;
  //use Illuminate\Foundation\Auth\User
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Admin extends Authenticatable
 {
-    use HasFactory,HasFactory, HasApiTokens;
+    use HasFactory,HasFactory, HasApiTokens,SoftDeletes;
 
     protected $fillable = ['name',
 'email', 'password',
@@ -20,5 +22,25 @@ class Admin extends Authenticatable
         'password',
         'remember_token',
     ];
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
+
+
+    //====================================================================
+
+
+
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
+
+
+
+
+
+
 
 }
