@@ -9,9 +9,9 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('activity__trips', function (Blueprint $table) {
+        Schema::create('activity_trips', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('trip_id')
@@ -21,6 +21,18 @@ return new class extends Migration
                 ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
 
 
+            $table->float('price');
+            $table->string('photo')->nullable();
+            $table->dateTime('activity_start_time');
+            $table->dateTime('activity_end_time');
+            $table->string('location');
+
+
+            $table->boolean('option');
+
+
+
+
             $table->timestamps();
         });
     }
@@ -28,7 +40,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('activity_trips');
     }

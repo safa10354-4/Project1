@@ -10,25 +10,22 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckOwner
 {
 
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
 
 
 
-        if (!empty(Auth::admin()) && Auth()->admin()->role!=0) {
+
+        if (!empty(Auth::user()) && Auth()->user()->role != 0) {
             return response()->json([
                 'status' => false,
             ], 401);
-        }
-
-        else {
+        } else {
             return $next($request);
         }
 
 
-
-
-
-
     }
+
+
 }

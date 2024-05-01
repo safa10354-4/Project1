@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Models\wallet;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WalletController extends Controller
 {
@@ -39,6 +41,16 @@ class WalletController extends Controller
             ]);
 
     }
+
+
+    //===========================================================================
+
+
+
+
+
+
+
 
 
 }

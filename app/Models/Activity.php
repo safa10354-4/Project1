@@ -12,6 +12,14 @@ class Activity extends Model
 
 
 
+
+
+    protected $fillable = [
+
+        'name_activity',
+        ];
+
+    //==============================================================================================
     public function trips()
     {
         return $this->belongsToMany(Trip::class);

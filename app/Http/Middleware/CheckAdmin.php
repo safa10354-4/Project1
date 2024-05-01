@@ -14,17 +14,27 @@ class CheckAdmin
     {
 
 
-        if (!empty(Auth::admin()) && Auth()->admin()->role!=1) {
 
+        if (!empty(Auth::user()) && Auth()->user()->role != 1) {
             return response()->json([
                 'status' => false,
             ], 401);
-        }
-
-        else {
+        } else {
             return $next($request);
         }
 
 
+
+
+
+
+
+
     }
+
+
+
+
+
+
 }

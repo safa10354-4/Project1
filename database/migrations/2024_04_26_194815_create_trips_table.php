@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('trips', function (Blueprint $table) {
             $table->id();
 
+            $table->string('flight_name');
+            $table->string('location');
+            $table->date('trip_start_date');
+            $table->date('trip_end_date');
+            $table->integer('trip_capacity');
+
             $table->foreignId('admin_id')
                 ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
 

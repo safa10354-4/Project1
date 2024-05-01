@@ -22,6 +22,19 @@ return new class extends Migration
 
 
 
+            $table->string('payment_status');
+
+            $table->string('reservation_status');
+
+
+            $table->bigInteger('rate');
+
+
+            $table->string('comment');
+
+
+
+
 
             $table->timestamps();
         });

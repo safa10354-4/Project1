@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-//use Illuminate\Foundation\Auth\Admin as Authenticatable;
- //use Illuminate\Foundation\Auth\User
+
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Admin extends Authenticatable
@@ -16,7 +15,7 @@ class Admin extends Authenticatable
 
     protected $fillable = ['name',
 'email', 'password',
-'description_company', 'type', 'company_website', 'image',];
+'description_company', 'type', 'company_website', 'image','role'];
 
     protected $hidden = [
         'password',
@@ -38,6 +37,9 @@ class Admin extends Authenticatable
     }
 
 
+
+
+//===========================================================================
 
 
 

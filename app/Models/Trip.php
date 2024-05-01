@@ -11,6 +11,18 @@ class Trip extends Model
 
 
 
+    protected $fillable = [
+        'flight_name',
+        'location',
+        'trip_start_date',
+        'trip_end_date',
+        'trip_capacity',
+        'admin_id'
+    ];
+
+
+
+    //=================================================================================================
 
 
     public function admin()
