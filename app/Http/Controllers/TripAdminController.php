@@ -8,7 +8,7 @@ use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class TripController extends Controller
+class TripAdminController extends Controller
 {
 
 
@@ -32,7 +32,7 @@ class TripController extends Controller
         ]);
 
         // إنشاء الرحلة
-        $flight = Trip::create([
+        $flight = Trip::query()->create([
             'admin_id' => Auth()->user()->id,
             'flight_name' => $validatedData['flight_name'],
             'location' => $validatedData['location'],
@@ -45,10 +45,10 @@ class TripController extends Controller
 
         foreach ($validatedData['activities'] as $activityData) {
             // ابحث عن النشاط بالاسم أو أنشئه إذا لم يكن موجودًا
-            $activity = Activity::firstOrCreate(['name_activity' => $activityData['name']]);
+            $activity = Activity::query()->firstOrCreate(['name_activity' => $activityData['name']]);
 
             // إنشاء الواصفات للنشاط
-            $activityTrip = ActivityTrip::create([
+            $activityTrip = ActivityTrip::query()->create([
                 'trip_id' => $flight['id'],
                 'activity_id' => $activity['id'],
                 'price' => $activityData['price'],
@@ -80,7 +80,81 @@ class TripController extends Controller
     }
 
 
+
+    //==========================================================================================
+
+
+
+
+    public function getAllTripsWithActivities()
+    {
+        // الحصول على جميع الرحلات مع النشاطات المرتبطة
+        $trips = Trip::with('activities')->get();
+
+        // إرجاع البيانات كمصفوفة JSON
+        return response()->json($trips, 200);
+    }
+
+
     //=====================================================================================================
+
+
+
+
+
+
+    public function updateTripWithActivities(Request $request, $tripId)
+    {
+        // تحقق من صحة البيانات المرسلة
+        $validatedData = $request->validate([
+            'flight_name' => 'nullable|string',
+            'location' => 'nullable|string',
+            'trip_start_date' => 'nullable|date',
+            'trip_end_date' => 'nullable|date',
+            'trip_capacity' => 'nullable|integer',
+            'activities' => 'nullable|array|min:1',
+            'activities.*.id' => 'required|integer',
+            'activities.*.name' => 'nullable|string',
+            'activities.*.price' => 'nullable|numeric',
+            'activities.*.activity_start_time' => 'nullable|date',
+            'activities.*.activity_end_time' => 'nullable|date',
+            'activities.*.location' => 'nullable|string',
+            'activities.*.option' => 'nullable|boolean',
+        ]);
+
+        // ابحث عن الرحلة
+        $trip = Trip::query()->findOrFail($tripId);
+
+        // تحديث بيانات الرحلة إذا تم تقديمها
+        if (!empty($validatedData)) {
+            $trip->update(array_filter($validatedData));
+        }
+
+        // تحديث أو إضافة النشاطات المرتبطة بالرحلة
+        foreach ($validatedData['activities'] as $activityData) {
+            $activityTrip = ActivityTrip::query()->findOrFail($activityData['id']); // ابحث عن النشاط المراد تحديثه
+
+            // تحديث بيانات النشاط إذا تم تقديمها
+            if (!empty($activityData)) {
+                $activityTrip->update(array_filter($activityData));
+            }
+        }
+
+        // إرسال رسالة نجاح إلى المستخدم
+        return response()->json(['message' => 'The flight and its activities have been updated successfully'], 200);
+    }
+
+
+
+//========================================================================================================
+
+
+
+
+
+
+
+
 
 
 }

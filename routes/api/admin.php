@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DeleteAccountController;
 use App\Http\Controllers\profileController;
+use App\Http\Controllers\TripAdminController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Http\Request;
@@ -46,7 +47,12 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 
     // Adding a trip by an admin
 
-    Route::post('/addTrip',[TripController::class, 'addTripWithActivities'])->middleware('check_owner');
+    Route::post('/addTrip',[TripAdminController::class, 'addTripWithActivities'])->middleware('check_owner');
+
+    // get all trips with activities
+
+    Route::get('/getAllTripsWithActivities',[TripAdminController::class, 'getAllTripsWithActivities'])->middleware('check_owner');
+
 
 
 });

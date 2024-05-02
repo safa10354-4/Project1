@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\profileController;
+use App\Http\Controllers\TripUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenController;
@@ -38,6 +39,15 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
         Route::post('update',[profileController::class,'update']);
         Route::post('/image',[profileController::class, 'image']);
         Route::post('/change',[profileController::class, 'updatePassword']);
+
+
+
+    // get all trips
+
+    Route::get('/getValidTripsWithAvailableSeats',[TripUserController::class, 'getValidTripsWithAvailableSeats']);
+
+
+    Route::get('/getAllActivitiesOptional/{id}',[TripUserController::class, 'getAllActivitiesOptional']);
 
 
 

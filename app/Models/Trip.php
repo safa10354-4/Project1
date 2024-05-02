@@ -31,14 +31,16 @@ class Trip extends Model
     }
 
 
+    //===============================================================================
+
     public function activities()
     {
-        return $this->belongsToMany(Activity::class);
+        return $this->belongsToMany(Activity::class,'activity_trips');
     }
 
 
 
-
+//=================================================================================================
 
 
     public function users()
