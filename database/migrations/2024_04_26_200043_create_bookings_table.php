@@ -24,13 +24,13 @@ return new class extends Migration
 
             $table->string('payment_status');
 
-            $table->string('reservation_status');
+            $table->string('reservation_status')->nullable();
 
 
-            $table->bigInteger('rate');
+            $table->bigInteger('rate')->nullable();
 
 
-            $table->string('comment');
+            $table->string('comment')->nullable();
 
 
 

@@ -28,6 +28,10 @@ return new class extends Migration
             $table->string('location');
 
 
+            //'description'
+
+            $table->string('description');
+
             $table->boolean('option');
 
 

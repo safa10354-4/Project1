@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\profileController;
 use App\Http\Controllers\TripUserController;
 use Illuminate\Http\Request;
@@ -48,6 +49,12 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
 
 
     Route::get('/getAllActivitiesOptional/{id}',[TripUserController::class, 'getAllActivitiesOptional']);
+
+
+    //$tripId
+
+
+    Route::post('/bookingTrip/{tripId}',[BookingController::class, 'bookTrip']);
 
 
 

@@ -29,6 +29,8 @@ class TripAdminController extends Controller
             'activities.*.activity_end_time' => 'required|date',
             'activities.*.location' => 'required|string',
             'activities.*.option' => 'required|boolean',
+            'activities.*.description' => 'required|string',
+
         ]);
 
         // إنشاء الرحلة
@@ -39,6 +41,8 @@ class TripAdminController extends Controller
             'trip_start_date' => $validatedData['trip_start_date'],
             'trip_end_date' => $validatedData['trip_end_date'],
             'trip_capacity' => $validatedData['trip_capacity'],
+
+            'seats_available'=>$validatedData['trip_capacity']
         ]);
 
 
@@ -57,7 +61,20 @@ class TripAdminController extends Controller
                 'activity_end_time' => $activityData['activity_end_time'],
                 'location' => $activityData['location'],
                 'option' => $activityData['option'],
+                'description' => $activityData['description'],
+
             ]);
+
+         //***************************************************************
+            //   حساب السعر الكلي لرحلة وهو عبالرة عن مجموع اسعار الانشطة الاجبارية
+             if($activityData['option']==1){
+
+                 $flight['price_non_optional_activities']= $flight['price_non_optional_activities']+$activityData['price'];
+
+                 $flight->save();
+             }
+
+             //******************************************************************
 
             // التحقق من وجود الصورة وتحميلها
             if (isset($activityData['photo'])) {

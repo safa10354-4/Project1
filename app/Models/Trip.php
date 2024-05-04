@@ -17,7 +17,9 @@ class Trip extends Model
         'trip_start_date',
         'trip_end_date',
         'trip_capacity',
-        'admin_id'
+        'admin_id',
+         'seats_available',
+        'price_non_optional_activities',
     ];
 
 

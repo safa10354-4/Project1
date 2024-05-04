@@ -32,4 +32,15 @@ class Booking extends Model
 
 //=======================================================================================================
 
+
+    public function activityTrips()
+    {
+        return $this->belongsToMany(ActivityTrip::class, 'booking_activity_trips', 'booking_id', 'activity_trip_id');
+    }
+
+
+
+
+
+
 }

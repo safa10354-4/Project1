@@ -20,6 +20,11 @@ return new class extends Migration
             $table->date('trip_end_date');
             $table->integer('trip_capacity');
 
+            $table->integer('seats_available')->nullable();
+
+            $table->integer('price_non_optional_activities')->default(0);
+
+
             $table->foreignId('admin_id')
                 ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
 

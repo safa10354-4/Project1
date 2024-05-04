@@ -21,9 +21,24 @@ class ActivityTrip extends Model
         'activity_end_time',
         'location',
 
-        'option'
+        'option',
+
+         'description'
 
     ];
+
+
+    //===============================================================================
+
+
+
+
+    public function bookings()
+    {
+        return $this->belongsToMany(Booking::class, 'booking_activity_trips', 'activity_trip_id', 'booking_id');
+    }
+
+
 
 
 }
