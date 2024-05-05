@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\ControlpanelController;
 use App\Http\Controllers\DeleteAccountController;
 use App\Http\Controllers\profileController;
+use App\Http\Controllers\ProflieController;
 use App\Http\Controllers\TripAdminController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\WalletController;
@@ -39,11 +41,9 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admin'] ],function(){
 
 
-    Route::get('/deleted2/{id}',[DeleteAccountController::class,'softDeletweb'])->middleware('check_owner');
-    Route::get('index1',[profileController::class,'index1'])->middleware('check_owner');
-    Route::post('update1',[profileController::class,'update1'])->middleware('check_owner');
-    Route::post('/change1',[profileController::class, 'updatePassword1'])->middleware('check_owner');
-
+    Route::get('index1',[ProflieController::class,'index1'])->middleware('check_owner');
+    Route::post('update1',[ProflieController::class,'update1'])->middleware('check_owner');
+    Route::post('change1',[ProflieController::class,'updatePassword1'])->middleware('check_owner');
 
     // Adding a trip by an admin
 
@@ -65,6 +65,19 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 
 Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admin'] ],function() {
 
+
+
+    Route::post('store2',[ControlpanelController::class,'store2'])->middleware('check_admin');
+    Route::post('store',[ControlpanelController::class,'store'])->middleware('check_admin');
+    Route::get('index',[ControlpanelController::class,'index'])->middleware('check_admin');
+    Route::post('update/{id}',[ControlpanelController::class,'update'])->middleware('check_admin');
+    Route::post('softDelete/{id}',[ControlpanelController::class,'softDelete'])->middleware('check_admin');
+    Route::get('show/{id}',[ControlpanelController::class,'show'])->middleware('check_admin');
+
+    Route::get('index2',[ControlpanelController::class,'index2'])->middleware('check_admin');
+    Route::post('update2/{id}',[ControlpanelController::class,'update2'])->middleware('check_admin');
+    Route::get('softDelete2/{id}',[ControlpanelController::class,'softDelete2'])->middleware('check_admin');
+    Route::get('show2/{id}',[ControlpanelController::class,'show2'])->middleware('check_admin');
 
     // Wallet_charging for superAdmin.
 

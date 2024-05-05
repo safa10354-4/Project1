@@ -24,7 +24,7 @@ class BookingController extends Controller
 
 
         $optionalActivities = $request->validate([
-           // 'trip_id' => 'required|exists:trips,id',
+            // 'trip_id' => 'required|exists:trips,id',
             'optional_activities' => 'array',
             'optional_activities.*.id' => 'exists:activity_trips,id',
         ]);
@@ -45,29 +45,40 @@ class BookingController extends Controller
         }
 
 
-
-
         // التحقق من توفر المقاعد
         if ($trip['seats_available'] <= 0) {
             return "عذرًا، جميع المقاعد تم حجزها لهذه الرحلة.";
         }
 
         // حساب سعر الرحلة
-        $totalPrice =$trip['price_non_optional_activities'];
+        $totalPrice = $trip['price_non_optional_activities'];
 
         // إضافة تكلفة الأنشطة الاختيارية إذا كانت محددة
-        if (!empty($optionalActivities)) {
-            foreach ($optionalActivities as $activityId) {
-                $optionalActivity = ActivityTrip::find($activityId);//->first();
-                $totalPrice +=$optionalActivity->price;
+        if (!empty($optionalActivities['optional_activities'])) {
+
+            foreach ($optionalActivities['optional_activities'] as $optionalActivity) {
+                $activity = ActivityTrip::find($optionalActivity['id']);
+                if ($activity) {
+                    $totalPrice += $activity->price;
+                }
             }
+
         }
 
         // التحقق من رصيد المحفظة
         $user = auth()->user();
 
 
-        $wallet = wallet::query()->find($user->id);//->first();
+        $existingBooking = Booking::where('trip_id', $tripId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($existingBooking) {
+            return "عذرًا، لا يمكنك حجز نفس الرحلة مرة أخرى.";
+        }
+
+
+        $wallet = wallet::query()->find($user->id);
 
 
         if ($wallet->balance < $totalPrice) {
@@ -75,7 +86,7 @@ class BookingController extends Controller
         }
 
         // تخصيص مقعد وتحديث عدد المقاعد المتاحة
-        $trip-> seats_available -= 1;
+        $trip->seats_available -= 1;
         $trip->save();
 
         // إنشاء سجل في جدول الحجوزات
@@ -83,28 +94,34 @@ class BookingController extends Controller
             'user_id' => $user->id,
             'trip_id' => $trip->id,
             'payment_status' => 'paid',
-           // 'reservation_status' => 'confirmed',
+             'reservation_status' => 'confirmed',
             //'rate' => $totalPrice,
             //'comment' => '',
         ]);
 
 
 //******************************************************************************
-        if (!empty($optionalActivities)) {
-            foreach ($optionalActivities as $activityId) {
 
-                BookingActivityTrip::query()->create([
 
-                    'booking_id'=>$booking['id'],
+        if (!empty($optionalActivities['optional_activities'])) {
 
-                    'activity_trip_id'=>$activityId->id,
 
-                ]);
+            foreach ($optionalActivities['optional_activities'] as $optionalActivity) {
 
-                    //$booking->activityTrips()->attach($activityId->id);
-
+                $activity = ActivityTrip::find($optionalActivity['id']);
+                if ($activity) {
+                    BookingActivityTrip::create([
+                        'booking_id' => $booking->id,
+                        'activity_trip_id' => $optionalActivity['id'],
+                    ]);
+                }
             }
         }
+
+
+        //$booking->activityTrips()->attach($activityId->id);
+
+
 
 
         //***************************************************************************************
@@ -120,7 +137,11 @@ class BookingController extends Controller
             'type' => 0, // خصم
         ]);
 
-        return "تم حجز الرحلة بنجاح.";
+        //return "تم حجز الرحلة بنجاح.";
+
+
+        return response()->json(['message' => 'The flight has been booked successfully'], 200);
+
 
     }
 

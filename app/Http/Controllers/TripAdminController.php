@@ -103,10 +103,10 @@ class TripAdminController extends Controller
 
 
 
-    public function getAllTripsWithActivities()
-    {
-        // الحصول على جميع الرحلات مع النشاطات المرتبطة
-        $trips = Trip::with('activities')->get();
+    public function getAllTripsWithActivities(){
+        // الحصول على جميع الرحلات المرتبطة بالمستخدم المصادق عليه
+        $user = auth()->user();
+        $trips = $user->trips()->with('activities')->get();
 
         // إرجاع البيانات كمصفوفة JSON
         return response()->json($trips, 200);
@@ -158,7 +158,11 @@ class TripAdminController extends Controller
         }
 
         // إرسال رسالة نجاح إلى المستخدم
+
         return response()->json(['message' => 'The flight and its activities have been updated successfully'], 200);
+
+
+
     }
 
 

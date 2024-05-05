@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\profileController;
+use App\Http\Controllers\ProflieController;
 use App\Http\Controllers\TripUserController;
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenController;
-use App\Http\Controllers\DeleteAccountController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,21 +34,28 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
 
 
 
-        // Route::get('index',[profileController::class,'index']);
-        Route::get('/deleted1/{id}',[DeleteAccountController::class,'softDelete']);
-        Route::get('index',[profileController::class,'index']);
-        Route::post('update',[profileController::class,'update']);
-        Route::post('/image',[profileController::class, 'image']);
-        Route::post('/change',[profileController::class, 'updatePassword']);
+    Route::get('index',[ProflieController::class,'index']);
+    Route::post('update',[ProflieController::class,'update']);
+    Route::post('change',[ProflieController::class,'updatePassword']);
+    Route::post('image',[ProflieController::class,'store1']);
+
+
+
+
 
 
 
     // get all trips
 
-    Route::get('/getValidTripsWithAvailableSeats',[TripUserController::class, 'getValidTripsWithAvailableSeats']);
+    Route::get('/getValidTrips',[TripUserController::class, 'getValidTrips']);
 
 
+      //   get all optional  activities
     Route::get('/getAllActivitiesOptional/{id}',[TripUserController::class, 'getAllActivitiesOptional']);
+
+
+    //   get all  non optional  activities
+    Route::get('/getAllActivities_Non_Optional/{id}',[TripUserController::class, 'getAllActivities_Non_Optional']);
 
 
     //$tripId
