@@ -10,11 +10,12 @@ class ActivityTrip extends Model
     use HasFactory;
 
 
-
     protected $fillable = [
 
         'trip_id',
         'activity_id',
+
+        'name',
         'price',
         'photo',
         'activity_start_time',
@@ -23,14 +24,12 @@ class ActivityTrip extends Model
 
         'option',
 
-         'description'
+        'description'
 
     ];
 
 
     //===============================================================================
-
-
 
 
     public function bookings()
@@ -39,6 +38,34 @@ class ActivityTrip extends Model
     }
 
 
+
+
+
+
+    //============================================================================================
+
+    // update
+
+
+    // تعريف العلاقة بين جدولي النشاطات والرحلات
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class, 'activity_id', 'id');
+    }
+
+
+
+    //**********************************************************************
+
+
+
+    public function trip()
+    {
+        return $this->belongsTo(Trip::class);
+    }
+
+
+ //===============================================================================
 
 
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\User;
+use App\Models\wallet;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,15 +14,14 @@ use Illuminate\Validation\Rules\Password;
 class ControlpanelController extends Controller
 {
 
-
-
     public function index()
     {
-//        $ex = [1];
-//        $posts = User::whereNotIn('id', $ex)->get();
         $posts = User::all();
         return response(['ListUsers'=> $posts]);
     }
+
+
+    //==============================================================================================
 
     public function store(Request $request)
     {
@@ -32,7 +33,6 @@ class ControlpanelController extends Controller
             'age' => ['required'],
             'nationality' => ['required'],
             'gender' => ['required'],
-           //'image' => ['required'],
         ]);
 
         $data = [
@@ -44,52 +44,38 @@ class ControlpanelController extends Controller
             'age' => $request->age,
             'gender' => $request->gender,
         ];
-//        if ($request->hasFile('image')) {
-//            $image = $request->file('image');
-//            $imageName = $image->hashName();
-//
-//            Storage::disk("public")->put($imageName, file_get_contents($image));
+        $users = User::query()->create($data);
+        $wallet = new Wallet();
+        $wallet['user_id'] = $users['id'];
 
-//            $users = User::query()->create(array_merge($data, [
-//                'image' => $imageName
-//            ]));
+        $wallet['balance'] = 0;
+        $wallet->save();
+
+        //**********************************************************************
 
 
-     $users = User::query()->create($data);
+        return response()->json([
 
-            $accessToken = $users->createToken('MyApp', ['admin'])->accessToken;
+            'users' => $users,
+        ], 200);}
 
-            return response()->json([
-               // 'message' => 'تم تحميل الصورة بنجاح',
-                'users' => $users,
-                'access_token' => $accessToken
-            ], 200);}
-
-//        } else {
-//            return response()->json(['message' => 'الرجاء إرفاق ملف صورة'], 400);
-//        }}
+//===================================================================================================
 
     public function update(Request $request, $id)
     {
 
-//        $post = User::find($id);
-//        $post->update($request->all());
-//        return
-//           response('success', 'User updated successfully.');
+        $input = $request->except('email', 'image', 'password');
 
-
-        $input = $request->except('email','image','password');
-        User::find($id)->update($input);
         if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $imageName = $image->hashName();
+            $avatarName = time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move(public_path('avatars'), $avatarName);
 
-        Storage::disk("public")->put($imageName, file_get_contents($image));
-        // Admin::find(Auth::id())->update($input);
+            User::find($id)->update(array_merge($input, ['image' => $avatarName]));
+        } else {
+            User::find($id)->update($input);
+        }
 
-        User::find($id)->update(array_merge($input, ['image' => $imageName]));}
-        return response(['message'=>'success User updated successfully.']);
-
+        return response(['message' => 'success User updated successfully.']);
     }
 
 
@@ -112,18 +98,12 @@ class ControlpanelController extends Controller
     }
 
 
-//    public function edit($id)
-//    {
-//        $post = User::find($id);
-//        return view('posts.edit', compact('post'));
-//    }
-
 
     public function index2()
     {
         $ex = [1];
-        $posts = User::whereNotIn('id', $ex)->get();
-//        $posts = Admin::all();
+        $posts = Admin::whereNotIn('id', $ex)->get();
+
         return response(['ListUsers'=> $posts]);
     }
 
@@ -134,7 +114,7 @@ class ControlpanelController extends Controller
             'email' => ['email', 'required', 'unique:admins'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'description_company' => ['required'],
-            //  'type'=>['required'],
+            'type'=>['required'],
             'company_website' => ['required'],
             'image' => ['required'],
         ]);
@@ -145,48 +125,40 @@ class ControlpanelController extends Controller
             'password' => bcrypt($request->password),
             'description_company' => $request->description_company,
             'company_website' => $request->company_website,
+            'type'=>$request->type,
         ];
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = $image->hashName();
+            $avatarName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $avatarName);
 
-            Storage::disk("public")->put($imageName, file_get_contents($image));
+            // تخزين المسار الكامل للصورة
+            $imagePath = 'images/' . $avatarName;
 
             $users = Admin::query()->create(array_merge($data, [
-                'image' => $imageName
+                'image' => $imagePath
             ]));
-
-            $accessToken = $users->createToken('MyApp',['admin'])->accessToken;
-
-            return response()->json([
-                'message' => 'تم تحميل الصورة بنجاح',
-                'users' => $users,
-                'access_token' => $accessToken
-            ], 200);
         } else {
-            return response()->json(['message' => 'الرجاء إرفاق ملف صورة'], 400);
-        }}
+            $users = Admin::query()->create($data);
+        }
+
+
+        return response()->json([
+
+            'info_owner' => $users,
+        ], 200);
+    }
 
     public function update2(Request $request, $id)
     {
 
-//        $post = User::find($id);
-//        $post->update($request->all());
-//        return
-//           response('success', 'User updated successfully.');
-
-
         $input = $request->except('email','image','password');
-      Admin::find($id)->update($input);
+        Admin::find($id)->update($input);
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = $image->hashName();
+            $imagePath = $request->file('image')->store('images');
 
-            Storage::disk("public")->put($imageName, file_get_contents($image));
-            // Admin::find(Auth::id())->update($input);
-
-            Admin::find($id)->update(array_merge($input, ['image' => $imageName]));}
+            Admin::find($id)->update(array_merge($input, ['image' => $imagePath]));}
         return response(['message'=>'success User updated successfully.']);
 
     }
@@ -210,19 +182,5 @@ class ControlpanelController extends Controller
         $user = Admin::find($id);
         return response(['user'=>$user ]);
     }
-
-
-    public function edit2($id)
-    {
-        $post = Admin::find($id);
-        return view('posts.edit', compact('post'));
-    }
-
-
-
-
-
-
-
 
 }

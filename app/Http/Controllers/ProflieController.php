@@ -36,44 +36,33 @@ class ProflieController extends Controller
     {
 
         $input = $request->except('email','image','password','phone_number');
-     User::find(Auth::id())->update($input);
-     if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = $image->hashName();
+        User::find(Auth::id())->update($input);
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images');
 
-            Storage::disk("public")->put($imageName, file_get_contents($image));
-            // Admin::find(Auth::id())->update($input);
+            User::find(Auth::id())->update(array_merge($input, ['image' =>$imagePath  ]));}
+        return response(['message'=>'success Profile updated successfully.']);
 
-            User::find(Auth::id())->update(array_merge($input, ['image' => $imageName]));}
-            return response(['message'=>'success Profile updated successfully.']);
-
-        }
-
-
-
+    }
 
 
     public function update1(Request $request)
     {
 
         $input = $request->except('email','image','password');
+
         Admin::find(Auth::id())->update($input);
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = $image->hashName();
+            $imagePath = $request->file('image')->store('images');
 
-            Storage::disk("public")->put($imageName, file_get_contents($image));
-
-            // Admin::find(Auth::id())->update($input);
-
-            Admin::find(Auth::id())->update(array_merge($input, [  'image' => $imageName, ]));
-}
-
-
-            return response(['message'=>'success Profile updated successfully.']);
-
-
+            Admin::find(Auth::id())->update(array_merge($input, [  'image' => $imagePath ]));
         }
+
+
+        return response(['message'=>'success Profile updated successfully.']);
+
+
+    }
 
 
     public function updatePassword1(Request $request)
@@ -128,62 +117,52 @@ class ProflieController extends Controller
 
 
 
-    public function store(Request $request,$id)
-    {
+//    public function store(Request $request)
+//    {
+////
 //
-
-        $input = $request->all();
-        // $request->file('image')->getClientOriginalExtension();
-        if ($request->hasFile('image')) {
-            $avatarName = time().'.'.$request->image->getClientOriginalExtension();
-            $request->image->move(public_path('avatars'), $avatarName);
-
-            $input['image'] = $avatarName;
-
-        } else {
-            unset($input['image']);
-        }
-
-        if ($request->filled('password')) {
-            $input['password'] = Hash::make($input['password']);
-        } else {
-            unset($input['password']);
-        }
-
-        User::find($id)->update($input);
-
-        return response(['message'=>'success Profile updated successfully.']);
-    }
+//
+//        if ($request->hasFile('image')) {
+//            $image = $request->file('image');
+//            $avatarName = time() . '.' . $image->getClientOriginalExtension();
+//            $image->move(public_path('images'), $avatarName);
+//
+//            // تخزين المسار الكامل للصورة
+//            $imagePath = 'images/' . $avatarName;
+//
+//
+//        if ($request->filled('password')) {
+//            $input['password'] = Hash::make($input['password']);
+//        } else {
+//            unset($input['password']);
+//        }
+//
+//        User::find($id)->update($input);
+//
+//        return response(['message'=>'success Profile updated successfully.']);
+//    }
 
     public function store1(Request $request)
 
     {
 
-        $request->validate([
-
-            'image' => 'required|image',
+        $request->validate(['image' => 'required|image',
 
         ]);
-//    $avatarName = time().'.'.$request->image>getClientOriginalExtension();
-//
-//    $request->image->move(public_path('avatars'), $avatarName);
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = $image->hashName();
+            $avatarName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $avatarName);
 
-            Storage::disk("public")->put($imageName, file_get_contents($image));
-            // Admin::find(Auth::id())->update($input);
+            // تخزين المسار الكامل للصورة
+            $imagePath = 'images/' . $avatarName;
             $user=Auth()->user();
 
-            $user->where('id','=',Auth::id())->update(['image' => $imageName]);
+            $user->where('id','=',Auth::id())->update(['image' => $imagePath]);
 
             return response(['massage'=>'success']);
 
         }
 
     }}
-
-
-
-

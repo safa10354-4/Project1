@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DeleteAccountController;
 use App\Http\Controllers\ProflieController;
 use App\Http\Controllers\TripUserController;
 
@@ -58,10 +59,38 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('/getAllActivities_Non_Optional/{id}',[TripUserController::class, 'getAllActivities_Non_Optional']);
 
 
-    //$tripId
+
+    // fetch details of a specific activity
+
+    Route::get('/getActivityDetails/{activityId}',[TripUserController::class, 'getActivityDetails']);
 
 
+
+
+    //  book a trip
     Route::post('/bookingTrip/{tripId}',[BookingController::class, 'bookTrip']);
+
+
+    //Cancel your trip reservation
+    Route::post('/cancelBooking/{bookingId}',[BookingController::class, 'cancelBooking']);
+
+
+    //   get all my reservation for the trip
+
+    Route::get('/getAllMyBookings',[BookingController::class, 'getAllMyBookings']);
+
+
+
+
+
+    Route::post('/rateBooking/{id}',[BookingController::class,'StoreReview']);
+
+
+
+    Route::post('softDelete',[DeleteAccountController::class,'softDelete']);
+
+
+
 
 
 

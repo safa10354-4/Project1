@@ -26,6 +26,8 @@ class Booking extends Model
 
            'comment',
 
+        'booking_price',
+
     ];
 
 

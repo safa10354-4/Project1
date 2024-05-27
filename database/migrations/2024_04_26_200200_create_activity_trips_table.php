@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('activity_id')
                 ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
 
-
+            $table->string('name');
             $table->float('price');
             $table->string('photo')->nullable();
             $table->dateTime('activity_start_time');

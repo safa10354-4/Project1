@@ -16,11 +16,22 @@ class WalletController extends Controller
     {
         $wallet = Wallet::query()->where('user_id', $id)->first();
 
+         $user=User::query()->findOrFail($id);
+
         $wallet['balance'] = $wallet['balance'] + $request['new_balance'];
 
 
         $wallet->save();
 
+
+
+         //*********************
+
+           $user['balance']=$wallet['balance'];
+
+           $user->save();
+
+        //*********************************
         Transaction::query()->create([
 
             'wallet_id' => $wallet['user_id'],

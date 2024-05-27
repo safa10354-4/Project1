@@ -33,6 +33,9 @@ return new class extends Migration
             $table->string('comment')->nullable();
 
 
+            $table->string('booking_price')->default(0);
+
+
 
 
 

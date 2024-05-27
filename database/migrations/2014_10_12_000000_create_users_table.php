@@ -26,6 +26,8 @@ return new class extends Migration
             //$table->softDeletes();
             $table->rememberToken();
             $table->bigInteger('points')->default(0);
+
+            $table->double('balance')->default(0);
             $table->timestamps();
         });
     }

@@ -17,11 +17,10 @@ class Activity extends Model
     protected $fillable = [
 
         'name_activity',
+        
         ];
 
     //==============================================================================================
-
-
 
 
 
@@ -30,6 +29,20 @@ class Activity extends Model
         return $this->belongsToMany(Trip::class,'activity_trips');
     }
 
+
+
+    //================================================================================================
+
+
+    public function activityTrips(){
+
+
+        return $this->hasMany(ActivityTrip::class);
+
+    }
+
+
+    //*******************************************************************************************************
 
 
 

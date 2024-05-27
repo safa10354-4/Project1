@@ -7,22 +7,20 @@ use App\Models\ActivityTrip;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use function Laravel\Prompts\select;
 
 class TripUserController extends Controller
 {
 
 
-
-
-    public function getValidTrips() {
+    public function getValidTrips()
+    {
         // استعلام لاختيار الرحلات التي يكون تاريخ بدايتها في المستقبل أو اليوم الحالي
 
-        $trips = Trip::where(function ($query) {
+        $trips = Trip::query()->where(function ($query) {
             $query->where('trip_start_date', '>=', Carbon::today())
-                ->where('seats_available','>',0);
-           })->get();
-
-
+                ->where('seats_available', '>', 0);
+        })->get();
 
 
         // التحقق مما إذا كانت هناك رحلات متاحة أم لا
@@ -31,44 +29,39 @@ class TripUserController extends Controller
         }
 
 
-
-              // إرجاع البيانات بتنسيق JSON
-              return response()->json($trips, 200);
-
+        // إرجاع البيانات بتنسيق JSON
+        return response()->json($trips, 200);
 
 
-          }
-
+    }
 
 
 //==========================================================================================
 
 
 
-            public function getAllActivitiesOptional($id) {
-                $optionalActivities = Trip::find($id)
-                    ->where('trip_start_date', '>=', Carbon::today())
-                    ->where('seats_available', '>', 0)
-                    ->with(['activities' => function ($query) {
-                        $query->where('option', 0)->select('name_activity');
-                    }])
-                    ->get();
+    public function getAllActivitiesOptional($id)
+    {
+        $activities = ActivityTrip::query()
+            ->where('trip_id', $id)
+            ->where('option',0)
+            ->select(['id','name','location','price'])
+            ->get();
 
 
-                // استخراج الأنشطة الاختيارية من كل رحلة وتجميعها في مصفوفة واحدة
-                $activities = [];
-                foreach ($optionalActivities as $trip) {
-                    $activities = array_merge($activities, $trip->activities->toArray());
-                }
+        if(!$activities){
+
+            return "No optional activities in this trip.";
+        }
 
 
-                if ( empty( $activities)) {
-                    return response()->json(['message' => 'There are no optional activities.'], 404);
-                }
+
+        return response()->json($activities, 200);
+    }
 
 
-                return response()->json($activities, 200);
-            }
+
+
 
 
 //===================================================================================================
@@ -76,45 +69,67 @@ class TripUserController extends Controller
 
 
 
+    public function getAllActivities_Non_Optional($id)
+    {
+        $activities = ActivityTrip::query()
+              ->where('trip_id', $id)
+                ->where('option',1)
+               ->select(['id','name','location','price'])
+                ->get();
 
 
-    public function getAllActivities_Non_Optional($id) {
 
 
-        $optionalActivities = Trip::find($id)
-            ->where('trip_start_date', '>=', Carbon::today())
-            ->where('seats_available', '>', 0)
-            ->with(['activities' => function ($query) {
-                $query->where('option',1)->select('name_activity');
-            }])
-            ->get();
+        if(!$activities){
 
-
-        // استخراج الأنشطة الاختيارية من كل رحلة وتجميعها في مصفوفة واحدة
-        $activities = [];
-        foreach ($optionalActivities as $trip) {
-            $activities = array_merge($activities, $trip->activities->toArray());
+            return "No non optional activities in this trip.";
         }
 
 
-        if ( empty( $activities)) {
-            return response()->json(['message' => 'There are not  non_optional activities.'], 404);
-        }
 
 
         return response()->json($activities, 200);
     }
 
 
+
+
+
+
+
     //====================================================================================================
 
 
 
+    // fetch details of a specific activity
 
 
 
+    function getActivityDetails($activityId) {
 
 
+        $activity = ActivityTrip::find($activityId);
+
+
+        unset($activity['trip_id'],$activity['activity_id'],$activity['option'],$activity['id'],$activity['name']);
+
+
+        if (!$activity) {
+            return 'Activity not found ';
+
+
+        }
+
+
+
+        return response()->json($activity, 200);
+
+
+    }
+
+
+
+    //******************************************************************************************************
 
 
 

@@ -23,6 +23,7 @@ class Superseeder extends Seeder
          'description_company'=>'ITE',
          'company_website'=>'Damascus',
          'image'=>'null',
+         'type'=>'null'
      ]);
 
 

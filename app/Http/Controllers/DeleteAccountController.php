@@ -3,76 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\Booking;
+use App\Models\Transaction;
+use App\Models\Trip;
 use App\Models\User;
+use App\Models\wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class DeleteAccountController extends Controller
 {
-    //Soft Delete Records mobile
-    public function softDelete($id)
+    public function softDelete()
     {
-        $post = User::find($id);
+        $userId = auth()->user()->id;
+        $user = User::find($userId);
 
-        if (!$post) {
-            return response()->json(['message' => 'Account not found'], 404);
-        }
-        $post->delete();
-        return response()->json(['message' => 'Account  soft deleted']);
-    }
+        if ($user) {
+            $trips = $user->trips->where('reservation_status', 'booked_up')->where('trip_end_date','>', Carbon::today());
 
-    public function softDeleteweb($id)
-    {
-        $post = Admin::find($id);
 
-        if (!$post) {
-            return response()->json(['message' => 'Account not found'], 404);
-        }
+            if (!$trips->isEmpty()) {
+                return response()->json(['message' => 'You cannot delete your account because you have reservations that you canceled, then try again']);
+            }
 
-        $post->delete();
+            if ($user->balance != 0) {
+                return response()->json(['message' => "You have a balance in your wallet. Contact the admin, withdraw it, then try again"]);
+            } else {
+                $user->delete();
+                return response()->json(['message' => "Account deleted"]);
+            }
 
-        return response()->json(['message' => 'Account soft deleted']);
-    }
-    ////////////////////////////////
-    //Showing Records
-    public function showPosts()
-    {
-        $posts = User::get();
-
-        return response()->json(['posts' => $posts]);
-    }
-    // Show Soft Deleted Records (Optional)
-    public function showSoftDeletedPosts()
-    {
-        $softDeletedPosts = User::onlyTrashed()->get();
-
-        return response()->json(['soft_deleted_posts' => $softDeletedPosts]);
-    }
-   // Restore Soft Deleted Records
-    public function restorePost($id)
-    {
-        $post = User::withTrashed()->find($id);
-
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
         }
 
-        $post->restore();
-
-        return response()->json(['message' => 'Post restored']);
-    }
-    //Permanently Delete Records
-    public function forceDeletePost($id)
-    {
-        $post = User::withTrashed()->find($id);
-
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
-        }
-
-        $post->forceDelete();
-
-        return response()->json(['message' => 'Post permanently deleted']);
     }
 
-}
+
+
+    //====================================================================================================
+
+
+    }

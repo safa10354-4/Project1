@@ -7,9 +7,11 @@ use App\Models\Booking;
 use App\Models\BookingActivityTrip;
 use App\Models\Transaction;
 use App\Models\Trip;
+use App\Models\User;
 use App\Models\wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
@@ -24,7 +26,7 @@ class BookingController extends Controller
 
 
         $optionalActivities = $request->validate([
-            // 'trip_id' => 'required|exists:trips,id',
+
             'optional_activities' => 'array',
             'optional_activities.*.id' => 'exists:activity_trips,id',
         ]);
@@ -41,13 +43,13 @@ class BookingController extends Controller
 
         // التحقق من تاريخ بداية الرحلة
         if ($trip['trip_start_date'] < Carbon::today()) {
-            return "لا يمكن حجز رحلة ماضية.";
+            return "It is not possible to book a past flight.";
         }
 
 
         // التحقق من توفر المقاعد
         if ($trip['seats_available'] <= 0) {
-            return "عذرًا، جميع المقاعد تم حجزها لهذه الرحلة.";
+            return "Sorry, all seats have been reserved for this flight.";
         }
 
         // حساب سعر الرحلة
@@ -74,7 +76,7 @@ class BookingController extends Controller
             ->first();
 
         if ($existingBooking) {
-            return "عذرًا، لا يمكنك حجز نفس الرحلة مرة أخرى.";
+            return "Sorry, you cannot book the same flight again.";
         }
 
 
@@ -82,7 +84,7 @@ class BookingController extends Controller
 
 
         if ($wallet->balance < $totalPrice) {
-            return "عذرًا، رصيد المحفظة غير كافٍ لحجز هذه الرحلة.";
+            return "Sorry, there is not enough wallet balance to book this trip.";
         }
 
         // تخصيص مقعد وتحديث عدد المقاعد المتاحة
@@ -91,12 +93,13 @@ class BookingController extends Controller
 
         // إنشاء سجل في جدول الحجوزات
         $booking = Booking::create([
+
             'user_id' => $user->id,
             'trip_id' => $trip->id,
             'payment_status' => 'paid',
-             'reservation_status' => 'confirmed',
-            //'rate' => $totalPrice,
-            //'comment' => '',
+             'reservation_status' => 'booked_up',//محجوز
+            'booking_price' => $totalPrice,
+
         ]);
 
 
@@ -130,6 +133,21 @@ class BookingController extends Controller
         $wallet->balance -= $totalPrice;
         $wallet->save();
 
+
+
+
+        //*************************************************
+
+
+         $user1=User::query()->findOrFail($user->id);
+
+                 $user1['balance']= $wallet->balance;
+
+                 $user1->save();
+
+
+
+        //***************************************************
         Transaction::create([
             'wallet_id' => $wallet->id,
             'amount' => $totalPrice,
@@ -137,10 +155,17 @@ class BookingController extends Controller
             'type' => 0, // خصم
         ]);
 
-        //return "تم حجز الرحلة بنجاح.";
 
 
-        return response()->json(['message' => 'The flight has been booked successfully'], 200);
+        return response()->json(['message' => 'The flight has been booked successfully',
+
+
+             'Booking price'=>$booking['booking_price'],
+
+
+            ],200);
+
+
 
 
     }
@@ -150,6 +175,153 @@ class BookingController extends Controller
 
 
 
+  //Cancel your trip reservation
+
+
+
+    public function cancelBooking($bookingId)
+    {
+        $booking = Booking::findOrFail($bookingId);
+
+        $trip = Trip::findOrFail($booking['trip_id']);
+
+
+        // التحقق من أن تاريخ بداية الرحلة يكون بعد أسبوع على الأقل من التاريخ الحالي
+        $tripStartDate = Carbon::parse($trip->trip_start_date);
+        $oneWeekFromNow = Carbon::today()->addWeek();
+
+        if ($tripStartDate->lt($oneWeekFromNow)) {
+            return response()->json(['message' => 'The reservation cannot be canceled at least one week before the start date of the trip'], 400);
+        }
+
+
+
+
+
+        // حساب قيمة الاسترجاع (١٠٪ من سعر الحجز)
+        $refundAmount = $booking->booking_price * 0.1;
+
+         $oldPrice= $booking->booking_price;
+        // تحديث حالة الحجز وسعره
+        $booking->reservation_status = 'cancelled'; //ملغي
+        $booking->booking_price = $refundAmount;
+
+        $booking->payment_status='refunded';
+        $booking->save();
+
+
+        $wallet = wallet::query()->where('user_id',$booking->user_id)->first();
+        $wallet->balance += $oldPrice-$refundAmount;
+         $wallet->save();
+
+
+
+         //==========================
+
+        $user=User::query()->findOrFail($booking->user_id);
+
+        $user['balance']= $wallet->balance;
+
+         $user->save();
+
+
+
+        //============================
+
+         //***************************
+
+          $trip['seats_available']= $trip['seats_available']+1;
+
+            $trip->save();
+
+         //********************************
+
+        // إنشاء سجل في جدول العمليات
+        Transaction::query()->create([
+            'wallet_id' => $wallet->id,
+            'amount' => $oldPrice-$refundAmount,
+            'balance_after_transaction' => $wallet->balance,
+            'type' => 1, // إعادة
+        ]);
+
+        return response()->json(['message' => 'The reservation has been successfully cancelled, then 10% of the reservation price will be refunded to your balance'], 200);
+    }
+
+
+
+
+
+
+
+//**************************************************************************************************
+
+
+
+
+    //   get all my reservation for the trip
+
+
+
+
+    public function getAllMyBookings()
+    {
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+
+        $bookings = Booking::query()->where('user_id', $user->id)
+            ->where('reservation_status', 'booked_up')
+            ->get();
+
+
+
+        if ($bookings->isEmpty()) {
+            return response()->json(['message' => 'You currently have no reservations'], 404);
+        }
+
+        return response()->json($bookings, 200);
+    }
+
+
+
+//============================================================================================
+
+
+
+
+
+
+
+    // Hebia
+
+
+
+    public function storeReview(Request $request, $id)
+    {
+        $this->validate($request, [
+            'rate' => 'required|integer|min:1|max:5',
+            'comment' => 'required|min:10',
+        ]);
+
+        $addReview = Booking::query()->where('user_id',Auth::user()->id)
+            ->where('trip_id', $id)
+            ->first();
+
+        if ($addReview) {
+            $addReview->rate = $request['rate'];
+            $addReview->comment = $request['comment'];
+            $addReview->save();
+
+            return response(['message' => 'success thanks for adding review!', 'review' => $addReview]);
+        }
+
+        return response(['message' => 'Error: Booking not found'], 404);
+    }
+
+
+
+
+
+
+//*******************************************************************************
 
 
 
