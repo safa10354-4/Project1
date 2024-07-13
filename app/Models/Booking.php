@@ -40,9 +40,18 @@ class Booking extends Model
         return $this->belongsToMany(ActivityTrip::class, 'booking_activity_trips', 'booking_id', 'activity_trip_id');
     }
 
+///44444444444444444444444444444444444444444444444444444
+
+    /// new in 7/11/2024 يوم السبت
 
 
+    public function trip()
+    {
+        return $this->belongsTo(Trip::class, 'trip_id');
+    }
 
+
+//444444444444444444444444444444444444444444444444444444
 
 
 }

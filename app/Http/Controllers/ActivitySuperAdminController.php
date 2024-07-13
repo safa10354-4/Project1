@@ -5,7 +5,7 @@ use App\Models\Activity;
 use App\Models\ActivityTrip;
 use Illuminate\Http\Request;
 
-class ActivityController extends Controller
+class ActivitySuperAdminController extends Controller
 {
 
 
@@ -23,7 +23,7 @@ class ActivityController extends Controller
 
 
 
-          Activity::create([
+          Activity::query()->create([
 
             'name_activity'=> $Activity['name'],
 

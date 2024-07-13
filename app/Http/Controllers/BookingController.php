@@ -18,8 +18,6 @@ class BookingController extends Controller
 
 
 
-
-
     public function bookTrip(Request $request,$tripId)
 
     {
@@ -32,7 +30,6 @@ class BookingController extends Controller
         ]);
 
 
-        // العثور على الرحلة المطلوبة
         $trip = Trip::find($tripId);
 
 
@@ -41,21 +38,20 @@ class BookingController extends Controller
         }
 
 
-        // التحقق من تاريخ بداية الرحلة
+
         if ($trip['trip_start_date'] < Carbon::today()) {
             return "It is not possible to book a past flight.";
         }
 
 
-        // التحقق من توفر المقاعد
         if ($trip['seats_available'] <= 0) {
             return "Sorry, all seats have been reserved for this flight.";
         }
 
-        // حساب سعر الرحلة
+
         $totalPrice = $trip['price_non_optional_activities'];
 
-        // إضافة تكلفة الأنشطة الاختيارية إذا كانت محددة
+
         if (!empty($optionalActivities['optional_activities'])) {
 
             foreach ($optionalActivities['optional_activities'] as $optionalActivity) {
@@ -67,7 +63,7 @@ class BookingController extends Controller
 
         }
 
-        // التحقق من رصيد المحفظة
+
         $user = auth()->user();
 
 
@@ -87,11 +83,11 @@ class BookingController extends Controller
             return "Sorry, there is not enough wallet balance to book this trip.";
         }
 
-        // تخصيص مقعد وتحديث عدد المقاعد المتاحة
+
         $trip->seats_available -= 1;
         $trip->save();
 
-        // إنشاء سجل في جدول الحجوزات
+
         $booking = Booking::create([
 
             'user_id' => $user->id,
@@ -129,7 +125,6 @@ class BookingController extends Controller
 
         //***************************************************************************************
 
-        // خصم سعر الرحلة من رصيد المحفظة وإضافة سجل في جدول العمليات
         $wallet->balance -= $totalPrice;
         $wallet->save();
 
@@ -186,7 +181,7 @@ class BookingController extends Controller
         $trip = Trip::findOrFail($booking['trip_id']);
 
 
-        // التحقق من أن تاريخ بداية الرحلة يكون بعد أسبوع على الأقل من التاريخ الحالي
+
         $tripStartDate = Carbon::parse($trip->trip_start_date);
         $oneWeekFromNow = Carbon::today()->addWeek();
 
@@ -198,11 +193,11 @@ class BookingController extends Controller
 
 
 
-        // حساب قيمة الاسترجاع (١٠٪ من سعر الحجز)
+
         $refundAmount = $booking->booking_price * 0.1;
 
          $oldPrice= $booking->booking_price;
-        // تحديث حالة الحجز وسعره
+
         $booking->reservation_status = 'cancelled'; //ملغي
         $booking->booking_price = $refundAmount;
 
@@ -228,7 +223,7 @@ class BookingController extends Controller
 
         //============================
 
-         //***************************
+
 
           $trip['seats_available']= $trip['seats_available']+1;
 
@@ -236,7 +231,7 @@ class BookingController extends Controller
 
          //********************************
 
-        // إنشاء سجل في جدول العمليات
+
         Transaction::query()->create([
             'wallet_id' => $wallet->id,
             'amount' => $oldPrice-$refundAmount,
@@ -261,17 +256,19 @@ class BookingController extends Controller
     //   get all my reservation for the trip
 
 
-
-
     public function getAllMyBookings()
     {
-        $user = auth()->user(); // الحصول على المستخدم الحالي
+        $user = auth()->user();
 
-        $bookings = Booking::query()->where('user_id', $user->id)
+        $currentDate = now();
+
+        $bookings = Booking::query()
+            ->where('user_id', $user->id)
             ->where('reservation_status', 'booked_up')
+            ->whereHas('trip', function($query) use ($currentDate) {
+                $query->where('trip_start_date', '>', $currentDate);
+            })
             ->get();
-
-
 
         if ($bookings->isEmpty()) {
             return response()->json(['message' => 'You currently have no reservations'], 404);
@@ -298,7 +295,7 @@ class BookingController extends Controller
     {
         $this->validate($request, [
             'rate' => 'required|integer|min:1|max:5',
-            'comment' => 'required|min:10',
+//            'comment' => 'required|min:10',
         ]);
 
         $addReview = Booking::query()->where('user_id',Auth::user()->id)
@@ -307,7 +304,7 @@ class BookingController extends Controller
 
         if ($addReview) {
             $addReview->rate = $request['rate'];
-            $addReview->comment = $request['comment'];
+//            $addReview->comment = $request['comment'];
             $addReview->save();
 
             return response(['message' => 'success thanks for adding review!', 'review' => $addReview]);
@@ -317,7 +314,26 @@ class BookingController extends Controller
     }
 
 
+    public function storeComment(Request $request, $id)
+    {
+        $this->validate($request, [
+            'comment' => 'required|min:10',
+        ]);
 
+        $addcomment = Booking::query()->where('user_id',Auth::user()->id)
+            ->where('trip_id', $id)
+            ->first();
+
+        if ($addcomment) {
+            $addcomment->comment = $request['comment'];
+            //   $addReview->comment = $request['comment'];
+            $addcomment->save();
+
+            return response(['message' => 'success thanks for adding comment!', 'comment' =>$addcomment]);
+        }
+
+        return response(['message' => 'Error: Booking not found'], 404);
+    }
 
 
 

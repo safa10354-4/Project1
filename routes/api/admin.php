@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ActivitySuperAdminController;
 use App\Http\Controllers\ControlpanelController;
 use App\Http\Controllers\DeleteAccountController;
 use App\Http\Controllers\profileController;
@@ -50,7 +50,7 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 
     // get all trips
 
-    Route::get('/getAllTripsCompany',[TripAdminController::class, 'getAllTrips'])->middleware('check_owner');
+    Route::get('/getAllTrips',[TripAdminController::class, 'getAllTrips'])->middleware('check_owner');
 
 
     // get a trip details
@@ -86,35 +86,23 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 
     //-----------------------------------------------------------------------
 
-        //Add a activity
+    //Add a activity
 
-        Route::post('/AddActivity/company',[ActivityController::class, 'AddActivity'])->middleware('check_owner');
+    Route::post('/AddActivityToCompany',[ActivitySuperAdminController::class, 'AddActivity'])->middleware('check_owner');
 
+    // get all activities
 
-        // get all activities
-
-        Route::get('/getAllActivities/company',[ActivityController::class, 'getAllActivities'])->middleware('check_owner');
-
-
-         // update name an activity
+    Route::get('/getAllActivitiesForCompany',[ActivitySuperAdminController::class, 'getAllActivities'])->middleware('check_owner');
 
 
-         Route::post('/updateActivity2/company/{id}',[ActivityController::class, 'updateActivity'])->middleware('check_owner');
-
-
-         // delete_Activity
-
-
-         Route::delete('/delete_Activity/company/{id}',[ActivityController::class, 'delete_Activity'])->middleware('check_owner');
-
-    //----------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
 
 
 
 
 
 
-    Route::get('/getAverage/{tripId}',[TripAdminController::class, 'getAverageRating'])->middleware('check_owner');
+//   Route::get('/getcomment/{tripId}',[TripAdminController::class,'getAverageRating'])->middleware('check_owner');
 
 
 
@@ -154,7 +142,7 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 
     // Adding a trip by superAdmin
 
-    Route::post('/addTrip',[TripAdminController::class, 'addTripWithActivities'])->middleware('check_admin');
+    Route::post('/addTripSuperAdmin',[TripAdminController::class, 'addTripWithActivities'])->middleware('check_admin');
 
 
 
@@ -163,26 +151,26 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 
     //Add a activity
 
-    Route::post('/AddActivity',[ActivityController::class, 'AddActivity'])->middleware('check_admin');
+    Route::post('/AddActivity',[ActivitySuperAdminController::class, 'AddActivity'])->middleware('check_admin');
 
 
     // get all activities
 
-    Route::get('/getAllActivities',[ActivityController::class, 'getAllActivities'])->middleware('check_admin');
+    Route::get('/getAllActivities',[ActivitySuperAdminController::class, 'getAllActivities'])->middleware('check_admin');
 
 
-     // update activity
+     // update activity only name
 
 
-     Route::post('/updateActivity2/{id}',[ActivityController::class, 'updateActivity'])->middleware('check_admin');
+     Route::post('/updateActivityOnlyName/{id}',[ActivitySuperAdminController::class, 'updateActivity'])->middleware('check_admin');
 
 
      // delete_Activity
 
 
-     Route::delete('/delete_Activity/{id}',[ActivityController::class, 'delete_Activity'])->middleware('check_admin');
+     Route::delete('/delete_Activity/{id}',[ActivitySuperAdminController::class, 'delete_Activity'])->middleware('check_admin');
 
 //----------------------------------------------------------------------------
 
-
+    Route::get('/getTripDetailsforadmin/{id}',[TripAdminController::class, 'getTripDetails'])->middleware('check_admin');
 });

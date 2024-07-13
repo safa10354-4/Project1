@@ -82,7 +82,8 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
 
 
 
-
+//    commentBooking
+      Route::post('/commentBooking/{id}',[BookingController::class,'storeComment']);
     Route::post('/rateBooking/{id}',[BookingController::class,'StoreReview']);
 
 

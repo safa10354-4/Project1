@@ -7,6 +7,7 @@ use App\Models\ActivityTrip;
 use App\Models\Booking;
 use App\Models\Trip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class TripAdminController extends Controller
@@ -80,14 +81,21 @@ class TripAdminController extends Controller
              //******************************************************************
 
             // التحقق من وجود الصورة وتحميلها
-            if (isset($activityData['photo'])) {
-                $image = $activityData['photo']; // الوصول إلى الصورة المرفقة مباشرة
-                $imageName = $image->hashName();
+//            if (isset($activityData['photo'])) {
+//                $image = $activityData['photo']; // الوصول إلى الصورة المرفقة مباشرة
+//                $imageName = $image->hashName();
+//
+//                Storage::disk("public")->put($imageName, file_get_contents($image));
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $avatarName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images'), $avatarName);
 
-                Storage::disk("public")->put($imageName, file_get_contents($image));
+                // تخزين المسار الكامل للصورة
+                $imagePath = 'images/' . $avatarName;
 
                 // تحديث الوصفة للنشاط برابط الصورة
-                $activityTrip->update(['photo' => $imageName]);
+                $activityTrip->update(['photo' =>  $imagePath]);
 
 
 
@@ -130,21 +138,38 @@ class TripAdminController extends Controller
 
 
 
-
+////
     public function getTripDetails($id){
 
 
         $trip=Trip::query()->find($id);
 
-        if (!$trip) {
-            return "Trip with ID $id not found.";
-        }
+ if (!$trip) {
+     return "Trip with ID $id not found.";
+ }
+ $tripId = intval($id);
+
+ $ratings = Booking::where('trip_id', $tripId)->pluck('rate')->filter(function ($value) {
+     return is_numeric($value) && $value > 0;
+ });
+
+ if ($ratings->isEmpty()) {
+     return response()->json(['message' =>$trip ], 200);
+ }
+            $averageRating = $ratings->avg();
+            $trip->rates= $averageRating;
 
 
-        return response()->json($trip, 200);
+        $comments = Booking::where('trip_id', $tripId)
+            ->whereNotNull('comment')
+            ->where('comment', '!=', '')
+            ->pluck('comment');
 
-    }
+        $trip->comments=$comments;
 
+        $trip->save();
+
+        return response()->json($trip, 200);}
 
 
    //*************************************************************************
@@ -414,13 +439,16 @@ class TripAdminController extends Controller
 
     public function getAverageRating($tripId)
     {
+        // جلب جميع التعليقات لرحلة معينة والتي ليست فارغة باستخدام trip_id
+        $comments = Booking::where('trip_id', $tripId)
+            ->whereNotNull('comment')
+            ->where('comment', '!=', '')
+            ->pluck('comment');
 
-        $averageRating = Booking::where('trip_id', $tripId)->avg('rate');
-
-
-        return response()->json(['averageRating' => $averageRating], 404);
-
+        // إرجاع التعليقات كاستجابة JSON
+        return response()->json(['comments' => $comments], 200);
     }
+
 
 
 

@@ -20,6 +20,8 @@ class Trip extends Model
         'admin_id',
          'seats_available',
         'price_non_optional_activities',
+        'comments',
+        'rates'
     ];
 
 

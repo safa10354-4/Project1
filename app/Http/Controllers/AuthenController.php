@@ -119,14 +119,18 @@ class AuthenController extends Controller
             'company_website' => $request->company_website,
         ];
 
+//
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = $image->hashName();
+            $avatarName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $avatarName);
 
-            Storage::disk("public")->put($imageName, file_get_contents($image));
+            // تخزين المسار الكامل للصورة
+            $imagePath = 'images/' . $avatarName;
 
             $admin = Admin::query()->create(array_merge($data, [
-                'image' => $imageName
+                'image' => $imagePath
             ]));
 
             $accessToken = $admin->createToken('MyApp',['admin'])->accessToken;
