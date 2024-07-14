@@ -26,8 +26,11 @@ return new class extends Migration
             //$table->softDeletes();
             $table->rememberToken();
             $table->bigInteger('points')->default(0);
-
             $table->double('balance')->default(0);
+
+
+            $table->string('device_token')->nullable();
+
             $table->timestamps();
         });
     }
@@ -35,8 +38,18 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
+//    public function down()
+//    {
+//        Schema::dropIfExists('users');
+//    }
+
+
+// firebase
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('device_token');
+        });
     }
+
 };

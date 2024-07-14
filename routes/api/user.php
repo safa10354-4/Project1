@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DeleteAccountController;
 use App\Http\Controllers\ProflieController;
+use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\TripUserController;
 
 use Illuminate\Support\Facades\Route;
@@ -90,6 +91,11 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
 
     Route::post('softDelete',[DeleteAccountController::class,'softDelete']);
 
+
+
+    //create_device_token
+
+    Route::post('/create_device_token', [PushNotificationController::class, 'create_device_token']);
 
 
 

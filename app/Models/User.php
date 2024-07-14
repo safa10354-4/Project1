@@ -23,6 +23,8 @@ class User extends Authenticatable
 'age', 'gender', 'nationality',
 
         'balance',
+
+        'device_token',
 ];
 
 

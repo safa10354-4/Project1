@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenController;
 use App\Models\Activity;
 
+
+use App\Http\Controllers\PushNotificationController;
+
+
+
 //1-owner && superAdmin.
 
 Route::post('admin/register',[AuthenController::class,'adminRegister']);
@@ -173,4 +178,12 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 //----------------------------------------------------------------------------
 
     Route::get('/getTripDetailsforadmin/{id}',[TripAdminController::class, 'getTripDetails'])->middleware('check_admin');
+
+
+    //**********************
+
+
+    Route::post('/send-push-notification', [PushNotificationController::class, 'sendPushNotification']);
 });
+
+
