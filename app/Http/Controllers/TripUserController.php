@@ -134,6 +134,22 @@ class TripUserController extends Controller
 
 
 
+    public function search(Request $request){
+        // Get the search value from the request
+        $search = $request->input('search');
+
+        // Search in the title and body columns from the posts table
+        $trips = Trip::query()
+            ->where('flight_name', 'LIKE', "%{$search}%")
+            ->orWhere('location', 'LIKE', "%{$search}%")->orWhere('price_non_optional_activities','LIKE', "%{$search}%")
+            ->get();
+
+        // Return the search view with the resluts compacted
+
+
+        return response(['message'=> $trips ]);
+    }
+
 
 
 

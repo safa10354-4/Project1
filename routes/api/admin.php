@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\ActivitySuperAdminController;
 use App\Http\Controllers\ControlpanelController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DeleteAccountController;
+use App\Http\Controllers\HotelController;
 use App\Http\Controllers\profileController;
 use App\Http\Controllers\ProflieController;
+use App\Http\Controllers\RestController;
 use App\Http\Controllers\TripAdminController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\WalletController;
@@ -48,7 +51,7 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
     Route::get('index1',[ProflieController::class,'index1'])->middleware('check_owner');
     Route::post('update1',[ProflieController::class,'update1'])->middleware('check_owner');
     Route::post('change1',[ProflieController::class,'updatePassword1'])->middleware('check_owner');
-
+    Route::post('deletedAccount',[DeleteAccountController::class,'softDeleteOwner'])->middleware('check_owner');
     // Adding a trip by an admin
 
     Route::post('/addTripCompany',[TripAdminController::class, 'addTripWithActivities'])->middleware('check_owner');
@@ -98,14 +101,32 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
     // get all activities
 
     Route::get('/getAllActivitiesForCompany',[ActivitySuperAdminController::class, 'getAllActivities'])->middleware('check_owner');
-
+    Route::get('/getCommentsForTripCompany/{tripId}',[TripAdminController::class,'getComment'])->middleware('check_owner');
 
     //-------------------------------------------------------------------------
 
+//hotels
 
+    Route::post('addHotels',[HotelController::class,'store'])->middleware('check_owner');;
+    Route::post('destroyHotels/{id}',[HotelController::class,'destroy'])->middleware('check_owner');
+    Route::post('updateHotels/{id}',[HotelController::class,'update'])->middleware('check_owner');
+    Route::post('searchHotels',[HotelController::class,'search'])->middleware('check_owner');
+    Route::get('getHotels',[HotelController::class,'index'])->middleware('check_owner');;
+    Route::get('showHotels/{id}',[HotelController::class,'show'])->middleware('check_owner');
 
+////rest
+    Route::post('addRests',[RestController::class,'store'])->middleware('check_owner');
+    Route::post('destroyRests/{id}',[RestController::class,'destroy'])->middleware('check_owner');
+    Route::post('updateRests/{id}',[RestController::class,'update'])->middleware('check_owner');
+    Route::get('showRests/{id}',[RestController::class,'show'])->middleware('check_owner');
+    Route::get('getRests',[RestController::class,'index'])->middleware('check_owner');
+///chat
 
+    Route::post('/sendMessagesAdmin', [ConversationController::class,'sendMessageAdmin'])->middleware('check_owner');
 
+    Route::get('/getMessagesAdmin/{id}', [ConversationController::class,'getMessagesAdmin'])->middleware('check_owner');
+//    getAllUsersWithAdmin
+    Route::get('/getAllUsersWithAdmin', [ConversationController::class,'getAllUsersWithAdmin'])->middleware('check_owner');
 
 //   Route::get('/getcomment/{tripId}',[TripAdminController::class,'getAverageRating'])->middleware('check_owner');
 
@@ -178,12 +199,25 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 //----------------------------------------------------------------------------
 
     Route::get('/getTripDetailsforadmin/{id}',[TripAdminController::class, 'getTripDetails'])->middleware('check_admin');
-
+    Route::get('/getCommentsForTrip/{tripId}',[TripAdminController::class,'getComment'])->middleware('check_admin');
 
     //**********************
 
-
+// for testing
     Route::post('/send-push-notification', [PushNotificationController::class, 'sendPushNotification']);
+    ///hotels
+    Route::post('addHotelsForSuper',[HotelController::class,'store'])->middleware('check_admin');;
+    Route::post('destroyHotelsForSuper/{id}',[HotelController::class,'destroy'])->middleware('check_admin');
+    Route::post('updateHotelsForSuper/{id}',[HotelController::class,'update'])->middleware('check_admin');
+    Route::post('searchHotelsForSuper',[HotelController::class,'search'])->middleware('check_admin');
+    Route::get('getHotelsForSuper',[HotelController::class,'index'])->middleware('check_admin');;
+    Route::post('showHotelsForSuper/{id}',[RestController::class,'show'])->middleware('check_admin');
+////rest
+    Route::post('addRestsForSuper',[RestController::class,'store'])->middleware('check_admin');
+    Route::post('destroyRestsForSuper/{id}',[RestController::class,'destroy'])->middleware('check_admin');
+    Route::post('updateRestsForSuper/{id}',[RestController::class,'update'])->middleware('check_admin');
+    Route::get('getRestsForSuper',[RestController::class,'index'])->middleware('check_admin');
+    Route::post('showRestsForSuper/{id}',[RestController::class,'show'])->middleware('check_admin');
 });
 
 

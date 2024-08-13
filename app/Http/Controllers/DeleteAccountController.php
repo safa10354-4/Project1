@@ -20,7 +20,7 @@ class DeleteAccountController extends Controller
         $user = User::find($userId);
 
         if ($user) {
-            $trips = $user->trips->where('reservation_status', 'booked_up')->where('trip_end_date','>', Carbon::today());
+            $trips = $user->trips->where('reservation_status', 'booked_up')->where('trip_end_date', '>', Carbon::today());
 
 
             if (!$trips->isEmpty()) {
@@ -34,13 +34,31 @@ class DeleteAccountController extends Controller
                 return response()->json(['message' => "Account deleted"]);
             }
 
-        }
+        }}
+        public function softDeleteOwner()
+    {
+        $AdminId = auth()->user()->id;
+        $admin = Admin::find($AdminId);
+        if ($admin) {
+            $trips = $admin->trips;
 
-    }
+
+            if (!$trips->isEmpty()) {
+                return response()->json(['message' => 'You cannot delete your account because you have Trips , then try again']);
+            }
+
+            else {
+                $admin->delete();
+                return response()->json(['message' => "Account deleted"]);
+            }
+
+            }}}
+
+
 
 
 
     //====================================================================================================
 
 
-    }
+

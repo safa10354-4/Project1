@@ -30,22 +30,40 @@ class BookingController extends Controller
         ]);
 
 
-        $trip = Trip::find($tripId);
+        $trip = Trip::query()->find($tripId);
 
 
         if (!$trip) {
-            return "Trip with ID $tripId not found.";
+
+            return response()->json([
+
+                'message' => 'Trip with ID $tripId not found.',
+
+            ],401);
+
         }
 
 
-
+        // التحقق من تاريخ بداية الرحلة
         if ($trip['trip_start_date'] < Carbon::today()) {
-            return "It is not possible to book a past flight.";
+
+            return response()->json([
+
+                'message' => 'It is not possible to book a past flight.',
+            ],401);
+
         }
 
 
+
+        // التحقق من توفر المقاعد
         if ($trip['seats_available'] <= 0) {
-            return "Sorry, all seats have been reserved for this flight.";
+            return response()->json([
+
+                'message' => 'Sorry, all seats have been reserved for this flight.',
+
+            ],401);
+
         }
 
 
@@ -55,7 +73,7 @@ class BookingController extends Controller
         if (!empty($optionalActivities['optional_activities'])) {
 
             foreach ($optionalActivities['optional_activities'] as $optionalActivity) {
-                $activity = ActivityTrip::find($optionalActivity['id']);
+                $activity = ActivityTrip::query()->find($optionalActivity['id']);
                 if ($activity) {
                     $totalPrice += $activity->price;
                 }
@@ -66,21 +84,14 @@ class BookingController extends Controller
 
         $user = auth()->user();
 
-
-        $existingBooking = Booking::where('trip_id', $tripId)
-            ->where('user_id', $user->id)
-            ->first();
-
-        if ($existingBooking) {
-            return "Sorry, you cannot book the same flight again.";
-        }
-
-
-        $wallet = wallet::query()->find($user->id);
-
-
+        $wallet = wallet::query()->find($user['id']);
         if ($wallet->balance < $totalPrice) {
-            return "Sorry, there is not enough wallet balance to book this trip.";
+            return response()->json([
+
+                'message' => 'Sorry, there is not enough wallet balance to book this trip.',
+
+            ],401);
+
         }
 
 
@@ -88,9 +99,9 @@ class BookingController extends Controller
         $trip->save();
 
 
-        $booking = Booking::create([
+        $booking = Booking::query()->create([
 
-            'user_id' => $user->id,
+            'user_id' => $user['id'],
             'trip_id' => $trip->id,
             'payment_status' => 'paid',
              'reservation_status' => 'booked_up',//محجوز
@@ -107,10 +118,10 @@ class BookingController extends Controller
 
             foreach ($optionalActivities['optional_activities'] as $optionalActivity) {
 
-                $activity = ActivityTrip::find($optionalActivity['id']);
+                $activity = ActivityTrip::query()->find($optionalActivity['id']);
                 if ($activity) {
-                    BookingActivityTrip::create([
-                        'booking_id' => $booking->id,
+                    BookingActivityTrip::query()->create([
+                        'booking_id' => $booking['id'],
                         'activity_trip_id' => $optionalActivity['id'],
                     ]);
                 }
@@ -118,14 +129,10 @@ class BookingController extends Controller
         }
 
 
-        //$booking->activityTrips()->attach($activityId->id);
-
-
-
 
         //***************************************************************************************
 
-        $wallet->balance -= $totalPrice;
+        $wallet['balance'] -= $totalPrice;
         $wallet->save();
 
 
@@ -134,26 +141,25 @@ class BookingController extends Controller
         //*************************************************
 
 
-         $user1=User::query()->findOrFail($user->id);
+         $user1=User::query()->findOrFail($user['id']);
 
-                 $user1['balance']= $wallet->balance;
+                 $user1['balance']= $wallet['balance'];
 
                  $user1->save();
 
 
 
         //***************************************************
-        Transaction::create([
-            'wallet_id' => $wallet->id,
+        Transaction::query()->create([
+            'wallet_id' => $wallet['id'],
             'amount' => $totalPrice,
-            'balance_after_transaction' => $wallet->balance,
+            'balance_after_transaction' => $wallet['balance'],
             'type' => 0, // خصم
         ]);
 
 
 
         return response()->json(['message' => 'The flight has been booked successfully',
-
 
              'Booking price'=>$booking['booking_price'],
 
@@ -166,7 +172,7 @@ class BookingController extends Controller
     }
 
 
-//**********************************************************************************************
+//=============================================================================================================
 
 
 
@@ -176,36 +182,33 @@ class BookingController extends Controller
 
     public function cancelBooking($bookingId)
     {
-        $booking = Booking::findOrFail($bookingId);
+        $booking = Booking::query()->findOrFail($bookingId);
 
-        $trip = Trip::findOrFail($booking['trip_id']);
-
-
-
-        $tripStartDate = Carbon::parse($trip->trip_start_date);
-        $oneWeekFromNow = Carbon::today()->addWeek();
-
-        if ($tripStartDate->lt($oneWeekFromNow)) {
-            return response()->json(['message' => 'The reservation cannot be canceled at least one week before the start date of the trip'], 400);
-        }
+        $trip = Trip::query()->findOrFail($booking['trip_id']);
 
 
+         $currentDate = now();
+        $bookingDate=$booking['created_at'];
+        $tripStartDate = Carbon::parse($trip['trip_start_date']);
 
 
+        $damageTime=$currentDate->diffInSeconds($bookingDate);
+        $Time_total= $tripStartDate->diffInSeconds($bookingDate);
 
+        $percent=$damageTime/$Time_total;
 
-        $refundAmount = $booking->booking_price * 0.1;
+        $refundAmount = $booking['booking_price'] * $percent;
 
-         $oldPrice= $booking->booking_price;
+         $oldPrice= $booking['booking_price'];
 
-        $booking->reservation_status = 'cancelled'; //ملغي
-        $booking->booking_price = $refundAmount;
+        $booking['reservation_status'] = 'cancelled'; //ملغي
+        $booking['booking_price'] = $refundAmount;
 
-        $booking->payment_status='refunded';
+        $booking['payment_status']='refunded';
         $booking->save();
 
 
-        $wallet = wallet::query()->where('user_id',$booking->user_id)->first();
+        $wallet = wallet::query()->where('user_id',$booking['user_id'])->first();
         $wallet->balance += $oldPrice-$refundAmount;
          $wallet->save();
 
@@ -213,7 +216,7 @@ class BookingController extends Controller
 
          //==========================
 
-        $user=User::query()->findOrFail($booking->user_id);
+        $user=User::query()->findOrFail($booking['user_id']);
 
         $user['balance']= $wallet->balance;
 
@@ -276,7 +279,6 @@ class BookingController extends Controller
 
         return response()->json($bookings, 200);
     }
-
 
 
 //============================================================================================

@@ -88,7 +88,7 @@ class WalletController extends Controller
     {
 
         $request->validate([
-            'new_balance'=>'required|double',
+            'new_balance'=>'required|numeric',
         ]);
 
         $wallet = Wallet::query()->where('user_id', $id)->first();
@@ -109,6 +109,10 @@ class WalletController extends Controller
             'type' => 1,
         ]);
 
+
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
         // إرسال إشعار للمستخدم
         $pushNotificationController = new PushNotificationController();
         $title = 'شحن المحفظة';
@@ -121,9 +125,15 @@ class WalletController extends Controller
             $pushNotificationController->sendPushNotification($title, $body, $token);
         }
 
+
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
         return response([
             'message' => 'The wallet was charged successfully.',
             'The quantity charged' => $request['new_balance']
         ]);
     }
+
+
 }

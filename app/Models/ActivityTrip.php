@@ -14,18 +14,16 @@ class ActivityTrip extends Model
 
         'trip_id',
         'activity_id',
-
         'name',
         'price',
         'photo',
         'activity_start_time',
         'activity_end_time',
         'location',
-
         'option',
-
-        'description'
-
+        'description',
+        'latitude',
+         'longitude',
     ];
 
 

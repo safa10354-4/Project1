@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
@@ -17,8 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
 
-            $table->foreignId('trip_id')
-                ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('trip_id')->constrained();
 
 
 
@@ -46,7 +45,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('bookings');
     }

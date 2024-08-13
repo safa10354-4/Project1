@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Trip extends Model
 {
     use HasFactory;
 
-
+   use SoftDeletes;
 
     protected $fillable = [
         'flight_name',
@@ -20,8 +21,9 @@ class Trip extends Model
         'admin_id',
          'seats_available',
         'price_non_optional_activities',
-        'comments',
-        'rates'
+        'rates',
+        'image',
+        'key'
     ];
 
 
@@ -52,6 +54,9 @@ class Trip extends Model
         return $this->belongsToMany(User::class, 'bookings', 'trip_id', 'user_id');
     }
 
-
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
 
 }

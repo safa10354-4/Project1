@@ -37,6 +37,35 @@ class Admin extends Authenticatable
     }
 
 
+    public function hotels()
+    {
+        return $this->hasMany('App\Hotel');
+    }
+
+    public function rests()
+    {
+        return $this->hasMany('App\Rest');
+    }
+
+
+    public function conversation(){
+
+        return $this->hasMany(Conversation::class);
+
+    }
+    public function getIsAdminAttribute()
+    {
+        return $this->role === 'admin'; // أو أي طريقة أخرى تستخدمها لتحديد ما إذا كان المستخدم هو إداري
+    }
+
+
+//===========================================================================
+
+
+
+
+
+
 
 
 //===========================================================================

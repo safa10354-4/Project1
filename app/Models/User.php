@@ -55,6 +55,45 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Trip::class, 'bookings', 'user_id', 'trip_id');
     }
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+
+//    public function hotels()
+//    {
+//        return $this->hasMany('App\Hotel');
+//    }
+//    public function rests()
+//    {
+//        return $this->hasMany('App\Rest');
+//    }
+    public function conversation(){
+
+        return $this->hasMany(Conversation::class);
+    }
+
+
+    public function tripUser(){
+
+        return $this->hasMany(TripUser::class);
+    }
+
+
+//    public function getIsAdminAttribute()
+//    {
+//        return $this->role === 'admin'; // أو أي طريقة أخرى تستخدمها لتحديد ما إذا كان المستخدم هو إداري
+//    }
+//====================================================================================
+
+
+
+
+
+
+
+
 
 
 

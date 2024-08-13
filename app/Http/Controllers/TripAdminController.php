@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Activity;
 use App\Models\ActivityTrip;
 use App\Models\Booking;
+use App\Models\Transaction;
 use App\Models\Trip;
+use App\Models\wallet;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -13,29 +15,30 @@ use Illuminate\Support\Facades\Storage;
 class TripAdminController extends Controller
 {
 
-
     public function addTripWithActivities(Request $request)
     {
-        // تحقق من صحة البيانات المرسلة
+
         $validatedData = $request->validate([
             'flight_name' => 'required|string',
             'location' => 'required|string',
             'trip_start_date' => 'required|date',
             'trip_end_date' => 'required|date',
             'trip_capacity' => 'required|integer',
-            'activities' => 'required|array|min:1', // يجب أن يكون هناك على الأقل نشاط واحد
+            'image' => 'nullable|file|image',
+            'activities' => 'required|array|min:1',
             'activities.*.name' => 'required|string',
             'activities.*.price' => 'required|numeric',
-            'activities.*.photo' => 'nullable',
+            'activities.*.photo' => 'nullable|file|image',
             'activities.*.activity_start_time' => 'required|date',
             'activities.*.activity_end_time' => 'required|date',
             'activities.*.location' => 'required|string',
             'activities.*.option' => 'required|boolean',
             'activities.*.description' => 'required|string',
-
+            'activities.*.latitude' => 'required',
+            'activities.*.longitude' => 'required',
         ]);
 
-        // إنشاء الرحلة
+
         $flight = Trip::query()->create([
             'admin_id' => Auth()->user()->id,
             'flight_name' => $validatedData['flight_name'],
@@ -43,148 +46,159 @@ class TripAdminController extends Controller
             'trip_start_date' => $validatedData['trip_start_date'],
             'trip_end_date' => $validatedData['trip_end_date'],
             'trip_capacity' => $validatedData['trip_capacity'],
-
-            'seats_available'=>$validatedData['trip_capacity']
+            'seats_available' => $validatedData['trip_capacity'],
+            'image' => null,
         ]);
 
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $avatarName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images'), $avatarName);
 
+
+            $imagePath = 'images/' . $avatarName;
+
+            $flight->update(['image' => $imagePath]);
+        }
 
         foreach ($validatedData['activities'] as $activityData) {
-            // ابحث عن النشاط بالاسم أو أنشئه إذا لم يكن موجودًا
-            $activity = Activity::query()->firstOrCreate(['name_activity' => $activityData['name']]);
 
-            // إنشاء الواصفات للنشاط
-            $activityTrip = ActivityTrip::query()->create([
-                'trip_id' => $flight['id'],
-                'activity_id' => $activity['id'],
+            $activity = Activity::firstOrCreate(['name_activity' => $activityData['name']]);
+
+
+            $activityTrip = ActivityTrip::create([
+                'trip_id' => $flight->id,
+                'activity_id' => $activity->id,
                 'price' => $activityData['price'],
-                //'photo' => $activityData['photo'],
                 'activity_start_time' => $activityData['activity_start_time'],
                 'activity_end_time' => $activityData['activity_end_time'],
                 'location' => $activityData['location'],
                 'option' => $activityData['option'],
                 'description' => $activityData['description'],
-
-                  'name'=>$activityData['name'],
-
+                'name' => $activityData['name'],
+                'latitude' => $activityData['latitude'],
+                'longitude' => $activityData['longitude'],
             ]);
 
-         //***************************************************************
-            //   حساب السعر الكلي لرحلة وهو عبالرة عن مجموع اسعار الانشطة الاجبارية
-             if($activityData['option']==1){
+            if ($activityData['option'] == 1) {
+                $flight->price_non_optional_activities += $activityData['price'];
+                $flight->save();
+            }
 
-                 $flight['price_non_optional_activities']= $flight['price_non_optional_activities']+$activityData['price'];
-
-                 $flight->save();
-             }
-
-             //******************************************************************
-
-            // التحقق من وجود الصورة وتحميلها
-//            if (isset($activityData['photo'])) {
-//                $image = $activityData['photo']; // الوصول إلى الصورة المرفقة مباشرة
-//                $imageName = $image->hashName();
-//
-//                Storage::disk("public")->put($imageName, file_get_contents($image));
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $avatarName = time() . '.' . $image->getClientOriginalExtension();
+            if (isset($activityData['photo']) && $activityData['photo']->isValid()) {
+                $image = $activityData['photo'];
+                $avatarName = time() . '_' . $image->getClientOriginalName();
                 $image->move(public_path('images'), $avatarName);
 
-                // تخزين المسار الكامل للصورة
+
                 $imagePath = 'images/' . $avatarName;
 
-                // تحديث الوصفة للنشاط برابط الصورة
-                $activityTrip->update(['photo' =>  $imagePath]);
-
-
-
+                $activityTrip->update(['photo' => $imagePath]);
             }
         }
 
+
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+        $Users = User::all();
+
+        foreach ($Users as $User) {
+            if ($User) {
+                $user = User::query()->find($User['user_id']);
+
+                if ($user) {
+                    $pushNotificationController = new PushNotificationController();
+                    $title = ' اضافة رحلة  ';
+                    $body = ' تمت اضافة رحلة جديدة الى  ' . $validatedData['location'];
+
+                    $token = $user['device_token'];
+
+                    if ($token) {
+                        $pushNotificationController->sendPushNotification($title, $body, $token);
+                    }
+                }
+            }
+        }
+
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
         return response()->json(['message' => 'The flight has been added successfully'], 200);
-
-
     }
 
 
-
-    //==========================================================================================
-
+    //=================================================================================================================
 
 
-
-    public function getAllTrips(){
+    public function getAllTrips()
+    {
 
         $user = auth()->user();
         $trips = $user->trips;
 
-         if(!$trips){
+        if (!$trips) {
 
             return "Not found trips";
-         }
+        }
 
-        // إرجاع البيانات كمصفوفة JSON
+
         return response()->json($trips, 200);
 
     }
 
 
-
-
-
-
     //=====================================================================================================
 
+    public function getTripDetails($id)
+    {
 
 
-////
-    public function getTripDetails($id){
+        $trip = Trip::query()->find($id);
 
+        if (!$trip) {
+            return "Trip with ID $id not found.";
+        }
+        $tripId = intval($id);
 
-        $trip=Trip::query()->find($id);
+        $ratings = Booking::where('trip_id', $tripId)->pluck('rate')->filter(function ($value) {
+            return is_numeric($value) && $value > 0;
+        });
 
- if (!$trip) {
-     return "Trip with ID $id not found.";
- }
- $tripId = intval($id);
+        if ($ratings->isEmpty()) {
+            return response()->json(['message' => $trip], 200);
+        }
+        $averageRating = $ratings->avg();
+        $trip->rates = $averageRating;
 
- $ratings = Booking::where('trip_id', $tripId)->pluck('rate')->filter(function ($value) {
-     return is_numeric($value) && $value > 0;
- });
-
- if ($ratings->isEmpty()) {
-     return response()->json(['message' =>$trip ], 200);
- }
-            $averageRating = $ratings->avg();
-            $trip->rates= $averageRating;
-
-
-        $comments = Booking::where('trip_id', $tripId)
-            ->whereNotNull('comment')
-            ->where('comment', '!=', '')
-            ->pluck('comment');
-
-        $trip->comments=$comments;
-
+//
+//        $comments = Booking::where('trip_id', $tripId)
+//            ->whereNotNull('comment')
+//            ->where('comment', '!=', '')
+//            ->pluck('comment');
+//
+//        $trip->comments=$comments;
+//
         $trip->save();
 
-        return response()->json($trip, 200);}
+        return response()->json($trip, 200);
+    }
 
 
-   //*************************************************************************
-
-    public function getActivityForTrip($id){
+    //*************************************************************************
 
 
+    public function getActivityForTrip($id)
+    {
 
-        $activities=ActivityTrip::query()->where('trip_id',$id)->get();
+
+        $activities = ActivityTrip::query()->where('trip_id', $id)->get();
 
 
-         if($activities->isEmpty()){
+        if ($activities->isEmpty()) {
 
             return "Not found activities.";
-         }
+        }
 
         // if (!$activities) {
         //     return "Trip with ID $id not found.";
@@ -197,141 +211,126 @@ class TripAdminController extends Controller
 //***************************************************************************************************
 
 
- // update a details of trip
+    // update a details of trip
 
 
+    public function updateTrip(Request $request, $tripId)
+    {
 
-        public function updateTrip(Request $request,$tripId)
-        {
-            // تحقق من صحة البيانات المرسلة
-            $validatedData = $request->validate([
+        $validatedData = $request->validate([
 
-                'flight_name' => 'nullable|string',
-                'location' => 'nullable|string',
-                'trip_start_date' => 'nullable|date',
-                'trip_end_date' => 'nullable|date',
-                'trip_capacity' => 'nullable|integer',
-            ]);
-
-
-            $trip = Trip::query()->findOrFail($tripId);
+            'flight_name' => 'nullable|string',
+            'location' => 'nullable|string',
+            'trip_start_date' => 'nullable|date',
+            'trip_end_date' => 'nullable|date',
+            'trip_capacity' => 'nullable|integer',
+            'image' => 'nullable',
+        ]);
 
 
-            if (!$trip) {
-                return "Trip with ID $tripId not found.";
-            }
+        $trip = Trip::query()->findOrFail($tripId);
 
 
-            if (!empty($validatedData)) {
+        if (!$trip) {
+            return "Trip with ID $tripId not found.";
+        }
+
+
+        if (!empty($validatedData)) {
             $trip->update($validatedData);
         }
 
 
+        return response()->json(['message' => 'The flight has been update successfully'], 200);
 
-            return response()->json(['message' => 'The flight has been update successfully'],200);
+
+    }
 
 
+    //**********************************************************************************
+
+
+    public function updateActivity(Request $request, $Id)
+    {
+
+        $validatedData = $request->validate([
+
+
+            'name' => 'nullable|string',
+            'price' => 'nullable|numeric',
+            'photo' => 'nullable',
+            'activity_start_time' => 'nullable|date',
+            'activity_end_time' => 'nullable|date',
+            'location' => 'nullable|string',
+            'option' => 'nullable|boolean',
+            'description' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+
+
+        $activityTrip = ActivityTrip::query()->find($Id);
+
+
+        $trip = Trip::query()->where('id', $activityTrip['trip_id'])->first();
+
+
+        if (!$activityTrip) {
+            return "Activity with ID $Id not found.";
+        }
+
+
+        //===================================================================
+
+
+        if (isset($validatedData['name'])) {
+            // البحث عن نشاط موجود
+            $activityName = Activity::query()->where('name_activity', $validatedData['name'])->first();
+            if ($activityName) {
+                $activityTrip['activity_id'] = $activityName->id;
+
+            } else {
+                // إذا لم يتم العثور على نشاط موجود، قم بإنشاء نشاط جديد
+                $activityName = Activity::query()->create([
+
+                    'name_activity' => $validatedData['name']
+
+                ]);
+
+
+                $activityTrip['activity_id'] = $activityName['id'];
+
+
+            }
+
+            $activityTrip->save();
 
         }
 
 
-
-        //**********************************************************************************
-
+        //=============================================================================================
 
 
-     public function updateActivity(Request $request,$Id)
-     {
-
-         $validatedData = $request->validate([
+        if ($activityTrip) {
 
 
-             'name' => 'nullable|string',
-             'price' => 'nullable|numeric',
-             'photo' => 'nullable',
-             'activity_start_time' => 'nullable|date',
-             'activity_end_time' => 'nullable|date',
-             'location' => 'nullable|string',
-             'option' => 'nullable|boolean',
-             'description' => 'nullable|string',
-         ]);
+            if (isset($validatedData['option']) && isset($validatedData['price'])) {
 
 
-         $activityTrip = ActivityTrip::query()->find($Id);
+                if ($activityTrip['option'] == 0 && $validatedData['option'] == 1) {
 
 
-         $trip =Trip::query()->where('id',$activityTrip['trip_id'])->first();
+                    $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] + $validatedData['price'];
 
 
-         if (!$activityTrip) {
-             return "Activity with ID $Id not found.";
-         }
+                } else if ($activityTrip['option'] == 1 && $validatedData['option'] == 0) {
 
 
-         //===================================================================
+                    $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] - $activityTrip['price'];
 
+                }
 
-         if (isset($validatedData['name'])) {
-             // البحث عن نشاط موجود
-             $activityName = Activity::query()->where('name_activity', $validatedData['name'])->first();
-
-
-             if($activityName) {
-                 $activityTrip['activity_id'] = $activityName->id;
-
-             }
-
-
-          else {
-              // إذا لم يتم العثور على نشاط موجود، قم بإنشاء نشاط جديد
-              $activityName = Activity::query()->create([
-
-                  'name_activity' => $validatedData['name']
-
-              ]);
-
-
-              //  تحديث activity_id في ActivityTrip للإشارة إلى النشاط الجديد
-
-              $activityTrip['activity_id'] = $activityName['id'];
-
-
-
-          }
-
-             $activityTrip->save();
-
-         }
-
-
-         //=============================================================================================
-
-
-         if ($activityTrip) {
-
-
-
-             if (isset($validatedData['option']) && isset($validatedData['price']) ) {
-
-
-
-                     if ($activityTrip['option'] == 0 && $validatedData['option'] == 1) {
-
-
-                     $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] + $validatedData['price'];
-
-
-                 } else if ($activityTrip['option'] == 1 && $validatedData['option'] == 0) {
-
-
-                     $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] -  $activityTrip['price'];
-
-                 }
-
-             }
-
-
-             else if (isset($validatedData['option'])){
+            } else if (isset($validatedData['option'])) {
 
 
                 if ($activityTrip['option'] == 0 && $validatedData['option'] == 1) {
@@ -346,71 +345,146 @@ class TripAdminController extends Controller
                     $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] - $activityTrip['price'];
 
                 }
-             }
-
-
-
-             else if (isset($validatedData['price'])){
+            } else if (isset($validatedData['price'])) {
 
 
                 if ($activityTrip['option'] == 1)
 
-                $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] - $activityTrip['price'] + $validatedData['price'];
+                    $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] - $activityTrip['price'] + $validatedData['price'];
 
 
+            }
 
-             }
-
-             $trip->save();
-
+            $trip->save();
 
 
-
-             if (!empty($validatedData)) {
+            if (!empty($validatedData)) {
                 $activityTrip->update($validatedData);
             }
 
 
-
-         }
-
+        }
 
 
-
-         return response()->json(['message' => 'Modified  successfully'], 200);
-
-
-     }
+        return response()->json(['message' => 'Modified  successfully'], 200);
 
 
-
-
-
-
-
+    }
 
 
 
     //************************************************************************************************
 
-    public function deleteTrip($id) {
+    //Hebia
 
 
-        $trip = Trip::find($id);
+//    public function getComment($tripId)
+//    {
+//
+//        $comments = Booking::where('trip_id', $tripId)->whereNotNull('comment')->where('comment', '!=', '')->pluck('comment');
+//
+//
+//        return response()->json(['comments' => $comments], 200);
+//    }
+    public function getComment($tripId)
+    {
+
+        $comments = Booking::where('trip_id', $tripId)
+            ->whereNotNull('comment')
+            ->where('comment', '!=', '')->get();
+        if (  $comments->isEmpty()) {
+            return response()->json(['message' => "not found comments"], 200);
+        }
+
+        $formattedComments = $comments->map(function ($booking) {
+            return [
+                'comment' => $booking->comment,
+                'user_name' => $booking->user->name,
+
+            'created_at' => $booking->created_at
+            ];
+        });
+
+        return response()->json(['comments' => $formattedComments], 200);
+    }
+
+
+
+
+    //*************************************************************************************************
+    //******************************************************************************************************************
+
+    public function deleteTrip($id)
+    {
+
+
+        $trip = Trip::query()->find($id);
 
         if (!$trip) {
             return response()->json(['message' => 'Flight not found'], 404);
         }
 
         $currentDate = now();
-        $tripEndDate = $trip->trip_end_date;
+        $tripEndDate = $trip['trip_end_date'];
 
-        if ($currentDate < $tripEndDate || $trip['seats_available']!=$trip['trip_capacity'] ) {
 
-            return response()->json(['message' => 'Cannot delete a valid trip'], 403);
+        if ($currentDate >= $tripEndDate) {
+
+            // soft delete to this trip
+
+            $trip->delete();
+
+        } else {
+
+            $UsersBooking = Booking::query()->where('trip_id', $id)->get();
+
+
+            foreach ($UsersBooking as $UserBooking) {
+
+                $user = User::query()->find($UserBooking['user_id']);
+
+                $wallet = Wallet::query()->where('user_id', $user['id'])->first();
+                $wallet['balance'] += $UserBooking['booking_price'];
+                $wallet->save();
+
+                //*********************
+                $user['balance'] = $wallet['balance'];
+                $user->save();
+                //************************
+
+                Transaction::query()->create([
+                    'wallet_id' => $wallet['user_id'],
+                    'amount' => $UserBooking['booking_price'],
+                    'balance_after_transaction' => $wallet['balance'],
+                    'type' => 1,
+                ]);
+
+                $UserBooking->delete();
+
+
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                // إرسال إشعار للمستخدم
+                $pushNotificationController = new PushNotificationController();
+                $title = 'الغاء حجز الرحلة ';
+                $body = 'تم الغاء حجزك في الرحلة وارجاع سعر الحجز الى محفظتك  ' . $trip['flight_name'];
+
+
+                $token = $user['device_token'];
+
+                if ($token) {
+                    $pushNotificationController->sendPushNotification($title, $body, $token);
+                }
+
+
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+            }
+
+            $trip->delete();
+
         }
 
-        $trip->delete();
 
         return response()->json(['message' => 'Trip deleted successfully'], 200);
 
@@ -418,43 +492,12 @@ class TripAdminController extends Controller
     }
 
 
-    //*****************************************************************************************
-
-
-
-
-
-
-
-
-
 //*******************************************************************************************************
 
 
 
-   //Hebia
 
 
-
-
-    public function getAverageRating($tripId)
-    {
-        // جلب جميع التعليقات لرحلة معينة والتي ليست فارغة باستخدام trip_id
-        $comments = Booking::where('trip_id', $tripId)
-            ->whereNotNull('comment')
-            ->where('comment', '!=', '')
-            ->pluck('comment');
-
-        // إرجاع التعليقات كاستجابة JSON
-        return response()->json(['comments' => $comments], 200);
-    }
-
-
-
-
-
-
-//*************************************************************************************************
 
 
 

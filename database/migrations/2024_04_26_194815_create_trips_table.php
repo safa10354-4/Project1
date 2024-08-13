@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
          Schema::create('trips', function (Blueprint $table) {
              $table->id();
@@ -22,9 +22,11 @@ return new class extends Migration
              $table->integer('seats_available')->nullable();
              $table->integer('price_non_optional_activities')->default(0);
              $table->integer('rates')->default(0);
-             $table->text('comments')->nullable();
+             $table->string('image')->nullable();
              $table->foreignId('admin_id')
                  ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+             $table->boolean('key')->default(0);
+             $table->softDeletes();
              $table->timestamps();
          });
     }
@@ -32,7 +34,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('trips');
     }

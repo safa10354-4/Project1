@@ -73,7 +73,7 @@ class ProflieController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
         if (!Hash::check($request->current_password, $user->password)) {
-            return response(['message'=>'failed']);
+            return response(['message'=>'failed'],401);
         }
         // Current password and new password same
         if (strcmp($request->get('current_password'), $request->password) == 0)
@@ -117,30 +117,6 @@ class ProflieController extends Controller
 
 
 
-//    public function store(Request $request)
-//    {
-////
-//
-//
-//        if ($request->hasFile('image')) {
-//            $image = $request->file('image');
-//            $avatarName = time() . '.' . $image->getClientOriginalExtension();
-//            $image->move(public_path('images'), $avatarName);
-//
-//            // تخزين المسار الكامل للصورة
-//            $imagePath = 'images/' . $avatarName;
-//
-//
-//        if ($request->filled('password')) {
-//            $input['password'] = Hash::make($input['password']);
-//        } else {
-//            unset($input['password']);
-//        }
-//
-//        User::find($id)->update($input);
-//
-//        return response(['message'=>'success Profile updated successfully.']);
-//    }
 
     public function store1(Request $request)
 
