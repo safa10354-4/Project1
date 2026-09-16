@@ -11,7 +11,7 @@ class Rest extends Model
     use HasFactory;
     protected $fillable = [
         'name', 'location', 'type',  'table_count', 'rate',
-'description','admin_id','image','key'
+'description','admin_id','image'
 
         // 'rates'
     ];

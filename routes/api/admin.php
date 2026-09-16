@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenController;
 use App\Models\Activity;
-
+use App\Http\Controllers\LocationController;
 
 use App\Http\Controllers\PushNotificationController;
 
@@ -131,7 +131,7 @@ Route::group( ['prefix' => 'admin','middleware' => ['auth:admin-api','scope:admi
 //   Route::get('/getcomment/{tripId}',[TripAdminController::class,'getAverageRating'])->middleware('check_owner');
 
 
-
+Route::post('/location', [LocationController::class, 'getCoordinates'])->middleware('check_owner');;
 
 });
 

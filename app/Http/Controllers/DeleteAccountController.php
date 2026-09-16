@@ -20,45 +20,23 @@ class DeleteAccountController extends Controller
         $user = User::find($userId);
 
         if ($user) {
-            $trips = $user->trips->where('reservation_status', 'booked_up')->where('trip_end_date', '>', Carbon::today());
+            $trips = $user->trips;}
 
 
-            if (!$trips->isEmpty()) {
-                return response()->json(['message' => 'You cannot delete your account because you have reservations that you canceled, then try again']);
-            }
+        foreach ($trips as $trip) {
+            $date = $trip['trip_end_date'] > Carbon::today();
 
-            if ($user->balance != 0) {
-                return response()->json(['message' => "You have a balance in your wallet. Contact the admin, withdraw it, then try again"]);
-            } else {
-                $user->delete();
-                return response()->json(['message' => "Account deleted"]);
-            }
+            $status = Booking::query()->where('user_id', $trip['pivot']['user_id'])->where('trip_id', $trip['pivot']['trip_id'])->where('reservation_status','booked_up')->get();
 
-        }}
-        public function softDeleteOwner()
-    {
-        $AdminId = auth()->user()->id;
-        $admin = Admin::find($AdminId);
-        if ($admin) {
-            $trips = $admin->trips;
+            if (!$trips->isEmpty() && $date&&  !$status->isEmpty() ) {
+                return response()->json(['message' => 'You cannot delete your account because you have upcoming reservations that are not canceled'],400);
+                break;
+            }}
+        if ($user->balance != 0) {
+            return response()->json(['message' => "You have a balance in your wallet. Contact the admin, withdraw it, then try again"],400);
+        } else {
+            $user->delete();
+            return response()->json(['message' => "Account deleted"]);
+        }
 
-
-            if (!$trips->isEmpty()) {
-                return response()->json(['message' => 'You cannot delete your account because you have Trips , then try again']);
-            }
-
-            else {
-                $admin->delete();
-                return response()->json(['message' => "Account deleted"]);
-            }
-
-            }}}
-
-
-
-
-
-    //====================================================================================================
-
-
-
+    }}

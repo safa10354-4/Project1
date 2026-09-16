@@ -9,28 +9,59 @@ use App\Models\Trip;
 use App\Models\wallet;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class TripAdminController extends Controller
 {
-
     public function addTripWithActivities(Request $request)
     {
 
         $validatedData = $request->validate([
             'flight_name' => 'required|string',
             'location' => 'required|string',
-            'trip_start_date' => 'required|date',
-            'trip_end_date' => 'required|date',
+            'trip_start_date' => [
+                'required',
+                'date',
+                'after_or_equal:'.Carbon::now()->format('Y-m-d')
+            ],
+            'trip_end_date' => [
+                'required',
+                'date',
+                'after_or_equal:trip_start_date'
+            ],
             'trip_capacity' => 'required|integer',
             'image' => 'nullable|file|image',
             'activities' => 'required|array|min:1',
             'activities.*.name' => 'required|string',
             'activities.*.price' => 'required|numeric',
             'activities.*.photo' => 'nullable|file|image',
-            'activities.*.activity_start_time' => 'required|date',
-            'activities.*.activity_end_time' => 'required|date',
+            'activities.*.activity_start_time' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) use ($request) {
+                    $tripStartDate = Carbon::parse($request->trip_start_date);
+                    $tripEndDate = Carbon::parse($request->trip_end_date);
+
+                    if (Carbon::parse($value)->lt($tripStartDate) || Carbon::parse($value)->gt($tripEndDate)) {
+                        $fail("The {$attribute} must be between the trip start date and the trip end date.");
+                    }
+                }
+            ],
+            'activities.*.activity_end_time' => [
+                'required',
+                'date',
+                'after_or_equal:activities.*.activity_start_time',
+                function ($attribute, $value, $fail) use ($request) {
+                    $tripStartDate = Carbon::parse($request->trip_start_date);
+                    $tripEndDate = Carbon::parse($request->trip_end_date);
+
+                    if (Carbon::parse($value)->lt($tripStartDate) || Carbon::parse($value)->gt($tripEndDate)) {
+                        $fail("The {$attribute} must be between the trip start date and the trip end date.");
+                    }
+                }
+            ],
             'activities.*.location' => 'required|string',
             'activities.*.option' => 'required|boolean',
             'activities.*.description' => 'required|string',
@@ -38,6 +69,8 @@ class TripAdminController extends Controller
             'activities.*.longitude' => 'required',
         ]);
 
+
+        //--------------------------------------------------------------------------------------------
 
         $flight = Trip::query()->create([
             'admin_id' => Auth()->user()->id,
@@ -98,6 +131,7 @@ class TripAdminController extends Controller
         }
 
 
+
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -105,7 +139,7 @@ class TripAdminController extends Controller
 
         foreach ($Users as $User) {
             if ($User) {
-                $user = User::query()->find($User['user_id']);
+                $user = User::query()->find($User['id']);
 
                 if ($user) {
                     $pushNotificationController = new PushNotificationController();
@@ -131,21 +165,35 @@ class TripAdminController extends Controller
     //=================================================================================================================
 
 
-    public function getAllTrips()
-    {
 
+    public function getAllTrips() {
         $user = auth()->user();
         $trips = $user->trips;
 
-        if (!$trips) {
-
-            return "Not found trips";
+        if ($trips->isEmpty()) {
+            return response()->json(['message' => 'Not found trips'], 404);
         }
 
+        foreach ($trips as $trip) {
+            $ratings = Booking::where('trip_id', $trip->id)->pluck('rate')->filter(function ($value) {
+                return is_numeric($value) && $value > 0;
+            });
+            
+            if (!$ratings->isEmpty()) {
+                $averageRating = $ratings->avg();
+                $trip->rates = $averageRating;
+            } else {
+              
+                $trip->rates = 0; 
+            }
+
+            
+            $trip->save();
+        }
 
         return response()->json($trips, 200);
-
     }
+
 
 
     //=====================================================================================================
@@ -154,67 +202,101 @@ class TripAdminController extends Controller
     {
 
 
-        $trip = Trip::query()->find($id);
+
+//        $trip = Trip::query()->where('admin_id',$user['id'])->where('id',$id)->get();
+
+
+        $user = auth()->user();
+
+
+        $trip = Trip::query()->where('admin_id', $user['id'])
+            ->where('id', $id)
+            ->first();
+
 
         if (!$trip) {
-            return "Trip with ID $id not found.";
+            return response()->json(['message' => "You have no trips with ID $id."], 404);
         }
+
+
         $tripId = intval($id);
 
         $ratings = Booking::where('trip_id', $tripId)->pluck('rate')->filter(function ($value) {
             return is_numeric($value) && $value > 0;
         });
-
+        
         if ($ratings->isEmpty()) {
             return response()->json(['message' => $trip], 200);
         }
         $averageRating = $ratings->avg();
         $trip->rates = $averageRating;
-
-//
-//        $comments = Booking::where('trip_id', $tripId)
-//            ->whereNotNull('comment')
-//            ->where('comment', '!=', '')
-//            ->pluck('comment');
-//
-//        $trip->comments=$comments;
-//
         $trip->save();
 
-        return response()->json($trip, 200);
+        return response()->json(['message' =>$trip],200);
     }
-
 
     //*************************************************************************
 
 
-    public function getActivityForTrip($id)
-    {
+  //  public function getActivityForTrip($id){
 
 
-        $activities = ActivityTrip::query()->where('trip_id', $id)->get();
+
+//        $activities=ActivityTrip::query()->where('trip_id',$id)->get();
+//
+//
+//        if($activities->isEmpty()){
+//
+//            return "Not found activities.";
+//        }
+//
+//        // if (!$activities) {
+//        //     return "Trip with ID $id not found.";
+//        // }
+//
+//        return response()->json($activities, 200);
+//
+//    }
 
 
-        if ($activities->isEmpty()) {
 
-            return "Not found activities.";
+
+        public function getActivityForTrip($id)
+        {
+            $user = auth()->user();
+
+
+            $trip = Trip::query()->where('id', $id)
+                ->where('admin_id', $user['id'])
+                ->first();
+
+
+            if (!$trip) {
+                return response()->json(['message' => "You have no trips with ID $id."], 404);
+            }
+
+
+            $activities = ActivityTrip::query()->where('trip_id', $id)->get();
+
+
+            if ($activities->isEmpty()) {
+                return response()->json(['message' => "No activities found for this trip."], 404);
+            }
+
+
+            return response()->json($activities, 200);
         }
 
-        // if (!$activities) {
-        //     return "Trip with ID $id not found.";
-        // }
 
-        return response()->json($activities, 200);
 
-    }
+
 
 //***************************************************************************************************
 
 
     // update a details of trip
 
-
-    public function updateTrip(Request $request, $tripId)
+    public function updateTrip(Request $request,$tripId)
     {
 
         $validatedData = $request->validate([
@@ -224,15 +306,16 @@ class TripAdminController extends Controller
             'trip_start_date' => 'nullable|date',
             'trip_end_date' => 'nullable|date',
             'trip_capacity' => 'nullable|integer',
-            'image' => 'nullable',
+            'image'=>'nullable',
         ]);
 
 
         $trip = Trip::query()->findOrFail($tripId);
 
 
-        if (!$trip) {
-            return "Trip with ID $tripId not found.";
+        if ($trip['admin_id'] !== auth()->id()) {
+            return response()->json(['message' => "You have no trips with ID $tripId."], 403);
+
         }
 
 
@@ -241,20 +324,49 @@ class TripAdminController extends Controller
         }
 
 
-        return response()->json(['message' => 'The flight has been update successfully'], 200);
+
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+        $Users = User::all();
+
+        foreach ($Users as $User) {
+            if ($User) {
+                $user = User::query()->find($User['id']);
+
+                if ($user) {
+                    $pushNotificationController = new PushNotificationController();
+                    $title = ' تعديل رحلة   '.$trip['flight_name'];
+                    $body = ' تم تعديل الرحلة التي ستقام في  ' . $trip['location'];
+
+                    $token = $user['device_token'];
+
+                    if ($token) {
+                        $pushNotificationController->sendPushNotification($title, $body, $token);
+                        return response()->json(['message' => 'الاشعار قد وصل '],200);
+
+
+                    }
+                }
+            }
+        }
+
+//----------------------------------------------------------------------------------------------------
+
+        return response()->json(['message' => 'The flight has been update successfully'],200);
+
 
 
     }
 
 
-    //**********************************************************************************
+    //***********************************************************************************************
 
 
-    public function updateActivity(Request $request, $Id)
+    public function updateActivity(Request $request,$Id)
     {
 
         $validatedData = $request->validate([
-
 
             'name' => 'nullable|string',
             'price' => 'nullable|numeric',
@@ -272,12 +384,16 @@ class TripAdminController extends Controller
         $activityTrip = ActivityTrip::query()->find($Id);
 
 
-        $trip = Trip::query()->where('id', $activityTrip['trip_id'])->first();
+        $trip =Trip::query()->where('id',$activityTrip['trip_id'])->first();
 
 
-        if (!$activityTrip) {
-            return "Activity with ID $Id not found.";
+
+
+        if ($trip['admin_id'] !== auth()->id()) {
+            return response()->json(['message' => "You have no activity with ID $Id."], 403);
+
         }
+
 
 
         //===================================================================
@@ -286,10 +402,13 @@ class TripAdminController extends Controller
         if (isset($validatedData['name'])) {
             // البحث عن نشاط موجود
             $activityName = Activity::query()->where('name_activity', $validatedData['name'])->first();
-            if ($activityName) {
+            if($activityName) {
                 $activityTrip['activity_id'] = $activityName->id;
 
-            } else {
+            }
+
+
+            else {
                 // إذا لم يتم العثور على نشاط موجود، قم بإنشاء نشاط جديد
                 $activityName = Activity::query()->create([
 
@@ -298,7 +417,9 @@ class TripAdminController extends Controller
                 ]);
 
 
+
                 $activityTrip['activity_id'] = $activityName['id'];
+
 
 
             }
@@ -314,7 +435,9 @@ class TripAdminController extends Controller
         if ($activityTrip) {
 
 
-            if (isset($validatedData['option']) && isset($validatedData['price'])) {
+
+            if (isset($validatedData['option']) && isset($validatedData['price']) ) {
+
 
 
                 if ($activityTrip['option'] == 0 && $validatedData['option'] == 1) {
@@ -326,11 +449,14 @@ class TripAdminController extends Controller
                 } else if ($activityTrip['option'] == 1 && $validatedData['option'] == 0) {
 
 
-                    $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] - $activityTrip['price'];
+                    $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] -  $activityTrip['price'];
 
                 }
 
-            } else if (isset($validatedData['option'])) {
+            }
+
+
+            else if (isset($validatedData['option'])){
 
 
                 if ($activityTrip['option'] == 0 && $validatedData['option'] == 1) {
@@ -345,7 +471,11 @@ class TripAdminController extends Controller
                     $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] - $activityTrip['price'];
 
                 }
-            } else if (isset($validatedData['price'])) {
+            }
+
+
+
+            else if (isset($validatedData['price'])){
 
 
                 if ($activityTrip['option'] == 1)
@@ -353,15 +483,13 @@ class TripAdminController extends Controller
                     $trip['price_non_optional_activities'] = $trip['price_non_optional_activities'] - $activityTrip['price'] + $validatedData['price'];
 
 
+
             }
-
             $trip->save();
-
 
             if (!empty($validatedData)) {
                 $activityTrip->update($validatedData);
             }
-
 
         }
 
@@ -378,23 +506,15 @@ class TripAdminController extends Controller
     //Hebia
 
 
-//    public function getComment($tripId)
-//    {
-//
-//        $comments = Booking::where('trip_id', $tripId)->whereNotNull('comment')->where('comment', '!=', '')->pluck('comment');
-//
-//
-//        return response()->json(['comments' => $comments], 200);
-//    }
     public function getComment($tripId)
     {
 
         $comments = Booking::where('trip_id', $tripId)
             ->whereNotNull('comment')
             ->where('comment', '!=', '')->get();
-        if (  $comments->isEmpty()) {
-            return response()->json(['message' => "not found comments"], 200);
-        }
+        // if (  $comments->isEmpty()) {
+        //     return response()->json(['message' => "not found comments"], 200);
+        // }
 
         $formattedComments = $comments->map(function ($booking) {
             return [
@@ -414,27 +534,33 @@ class TripAdminController extends Controller
     //*************************************************************************************************
     //******************************************************************************************************************
 
-    public function deleteTrip($id)
-    {
+    public function deleteTrip($id) {
 
 
         $trip = Trip::query()->find($id);
 
-        if (!$trip) {
-            return response()->json(['message' => 'Flight not found'], 404);
+
+        if ($trip['admin_id'] !== auth()->id()) {
+            return response()->json(['message' => "You have no trips with ID $id."], 403);
+
         }
+
+
 
         $currentDate = now();
         $tripEndDate = $trip['trip_end_date'];
 
 
-        if ($currentDate >= $tripEndDate) {
+        if($currentDate >= $tripEndDate){
 
             // soft delete to this trip
 
             $trip->delete();
 
-        } else {
+        }
+
+
+        else {
 
             $UsersBooking = Booking::query()->where('trip_id', $id)->get();
 
@@ -489,37 +615,11 @@ class TripAdminController extends Controller
         return response()->json(['message' => 'Trip deleted successfully'], 200);
 
 
+
     }
 
 
 //*******************************************************************************************************
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

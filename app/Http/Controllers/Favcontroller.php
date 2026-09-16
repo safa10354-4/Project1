@@ -53,10 +53,9 @@ class Favcontroller extends Controller
         $favorite = new Favorite();
         $favorite->user()->associate($user);
         $model->favorites()->save($favorite);
-        $model->key = 1; // تأكد من أن لديك عمود key في الجدول
-        $model->save();
 
-       return response()->json(['message' => 'Item added to favorites'], 200);
+
+        return response()->json(['message' => 'Item added to favorites'], 200);
     }
 
     public function removeFavorite(Request $request)
@@ -90,14 +89,14 @@ class Favcontroller extends Controller
         }
 
         $favorite->delete();
-        $model->key =0; // تأكد من أن لديك عمود key في الجدول
-        $model->save();
+
+
 
         return response()->json(['message' => 'Item removed from favorites'], 200);
     }
 
 
-        public function getFavorites()
+    public function getFavorites()
     {
         $user = Auth::user();
 
@@ -119,7 +118,3 @@ class Favcontroller extends Controller
 
         return response()->json($items);
     }}
-
-
-
-

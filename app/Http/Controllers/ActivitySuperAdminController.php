@@ -16,7 +16,6 @@ class ActivitySuperAdminController extends Controller
 
         $Activity = $request->validate([
 
-
         'name' => 'required|string',
 
         ]);
@@ -49,8 +48,6 @@ class ActivitySuperAdminController extends Controller
 public function getAllActivities()
 {
     $activities = Activity::query()->get();
-
-
 
 
     if(!$activities){

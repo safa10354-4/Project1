@@ -8,32 +8,38 @@ use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use function Laravel\Prompts\select;
+use function PHPUnit\Framework\isEmpty;
 
 class TripUserController extends Controller
 {
 
-
     public function getValidTrips()
     {
-        // استعلام لاختيار الرحلات التي يكون تاريخ بدايتها في المستقبل أو اليوم الحالي
 
+        $userId = auth()->id();
         $trips = Trip::query()->where(function ($query) {
             $query->where('trip_start_date', '>=', Carbon::today())
                 ->where('seats_available', '>', 0);
         })->get();
 
+        foreach ($trips as $trip) {
+            // Check if the hotel is a favorite for the authenticated user
+            $trip->is_favorite = $trip->favorites->contains('user_id', $userId);
+            // Remove the favorites relationship from the response
+            unset($trip->favorites);
+        }
 
-        // التحقق مما إذا كانت هناك رحلات متاحة أم لا
         if ($trips->isEmpty()) {
             return response()->json(['message' => 'There are not trips'], 404);
         }
 
-
-        // إرجاع البيانات بتنسيق JSON
         return response()->json($trips, 200);
 
 
     }
+
+
+
 
 
 //==========================================================================================
@@ -42,21 +48,29 @@ class TripUserController extends Controller
 
     public function getAllActivitiesOptional($id)
     {
-        $activities = ActivityTrip::query()
-            ->where('trip_id', $id)
-            ->where('option',0)
-            ->select(['id','name','location','price'])
-            ->get();
 
+        $trip = Trip::query()->find($id);
+        if ( !$trip ) {
+            return response()->json(['message' => "You have no trips with ID $id."], 403);
 
-        if(!$activities){
-
-            return "No optional activities in this trip.";
         }
 
+        else {
+            $activities = ActivityTrip::query()
+                ->where('trip_id', $id)
+                ->where('option', 0)
+                ->select(['id', 'name', 'location', 'price', 'photo', 'activity_start_time', 'activity_end_time', 'description',])
+                ->get();
 
 
-        return response()->json($activities, 200);
+            if ($activities->isEmpty()) {
+                return "No optional activities in this trip.";
+            }
+
+           else
+               return response()->json($activities, 200);
+
+        }
     }
 
 
@@ -71,24 +85,33 @@ class TripUserController extends Controller
 
     public function getAllActivities_Non_Optional($id)
     {
-        $activities = ActivityTrip::query()
-              ->where('trip_id', $id)
-                ->where('option',1)
-               ->select(['id','name','location','price'])
-                ->get();
 
 
+        $trip = Trip::query()->find($id);
+        if ( !$trip ) {
+            return response()->json(['message' => "You have no trips with ID $id."], 403);
 
-
-        if(!$activities){
-
-            return "No non optional activities in this trip.";
         }
 
 
+        else {
+
+            $activities = ActivityTrip::query()
+                ->where('trip_id', $id)
+                ->where('option', 1)
+                ->select(['id', 'name', 'location', 'price', 'photo', 'activity_start_time', 'activity_end_time', 'description',])
+                ->get();
 
 
-        return response()->json($activities, 200);
+            if ($activities->isEmpty()){
+
+                return "No non optional activities in this trip.";
+            }
+
+            else
+            return response()->json($activities, 200);
+
+        }
     }
 
 
@@ -116,8 +139,6 @@ class TripUserController extends Controller
 
         if (!$activity) {
             return 'Activity not found ';
-
-
         }
 
 
@@ -133,9 +154,9 @@ class TripUserController extends Controller
 
 
 
-
     public function search(Request $request){
         // Get the search value from the request
+        $userId = auth()->id();
         $search = $request->input('search');
 
         // Search in the title and body columns from the posts table
@@ -143,8 +164,12 @@ class TripUserController extends Controller
             ->where('flight_name', 'LIKE', "%{$search}%")
             ->orWhere('location', 'LIKE', "%{$search}%")->orWhere('price_non_optional_activities','LIKE', "%{$search}%")
             ->get();
-
-        // Return the search view with the resluts compacted
+        foreach ($trips as $trip) {
+            // Check if the hotel is a favorite for the authenticated user
+            $trip->is_favorite = $trip->favorites->contains('user_id', $userId);
+            // Remove the favorites relationship from the response
+            unset($trip->favorites);
+        }
 
 
         return response(['message'=> $trips ]);

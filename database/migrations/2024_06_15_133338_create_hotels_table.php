@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('description')->nullable();
             $table->integer('rate');
-            $table->boolean('key')->default(0);
             $table->foreignId('admin_id')
                 ->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();

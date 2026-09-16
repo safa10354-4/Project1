@@ -22,8 +22,7 @@ class Trip extends Model
          'seats_available',
         'price_non_optional_activities',
         'rates',
-        'image',
-        'key'
+        'image'
     ];
 
 

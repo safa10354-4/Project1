@@ -45,11 +45,11 @@ class Booking extends Model
     /// new in 7/11/2024 يوم السبت
 
 
+
     public function trip()
     {
         return $this->belongsTo(Trip::class, 'trip_id');
     }
-
 
 //444444444444444444444444444444444444444444444444444444
     public function user()

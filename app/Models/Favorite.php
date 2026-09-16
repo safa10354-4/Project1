@@ -14,7 +14,7 @@ class Favorite extends Model
     // App/Models/Favorite.php
     // Assuming your table is named 'favorites'
     protected $fillable = [
-       ' user_id', 'favoritable_id', 'favoritable_type',
+        ' user_id', 'favoritable_id', 'favoritable_type',
         // 'rates'
     ];
 

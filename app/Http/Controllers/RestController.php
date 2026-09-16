@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Hotel;
 use App\Models\Rest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,10 +19,24 @@ class RestController extends Controller
     }
 
     //user
+//    public function index1()
+//    {
+//        $restaurants = Rest::all();
+//        return response(['restaurants'=>$restaurants]);
+//    }
     public function index1()
     {
-        $restaurants = Rest::all();
-        return response(['restaurants'=>$restaurants]);
+        $userId = auth()->id();
+        $Rests = Rest::with('favorites')->get();
+
+        foreach ($Rests as $Rest) {
+            // Check if the hotel is a favorite for the authenticated user
+            $Rest->is_favorite = $Rest->favorites->contains('user_id', $userId);
+            // Remove the favorites relationship from the response
+            unset($Rest->favorites);
+        }
+
+        return response()->json(['Rests' => $Rests], 200);
     }
 
 
@@ -39,19 +54,27 @@ class RestController extends Controller
     }
 
 
+   //***
+
+
     public function search(Request $request){
+        $userId = auth()->id();
         // Get the search value from the request
         $search = $request->input('search');
-//$p=Rest::where->('admin_id',Auth::id());
-        // Search in the title and body columns from the posts table
-        $rests = Rest::query()
+
+        $Rests = Rest::query()
             ->where('name', 'LIKE', "%{$search}%")
             ->orWhere('location', 'LIKE', "%{$search}%")->orWhere('table_count','LIKE', "%{$search}%")
             ->get();
+        foreach ($Rests as $Rest) {
+            // Check if the hotel is a favorite for the authenticated user
+            $Rest->is_favorite = $Rest->favorites->contains('user_id', $userId);
+            // Remove the favorites relationship from the response
+            unset($Rest->favorites);
+        }
+        return response(['message'=> $Rests ]);}
 
-        // Return the search view with the resluts compacted
-        return response(['message'=> $rests ]);
-    }
+    //****
 
     public function store(Request $request)
     {
@@ -113,7 +136,6 @@ class RestController extends Controller
 
         return response(['success', 'Restaurant updated successfully.']);
     }
-
     public function destroy($id)
     {
         $rest= Rest::find($id);
@@ -127,4 +149,3 @@ class RestController extends Controller
         return response(['success', 'Restaurant deleted successfully.']);
     }
 }
-

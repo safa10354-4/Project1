@@ -13,24 +13,27 @@ class Message implements ShouldBroadcast
 use Dispatchable, InteractsWithSockets, SerializesModels;
 
 public $message;
-public $senderName;
-public $senderType;
-public $senderId;
-public $receiverId; // تأكد من إضافة الخصائص المطلوبة
+public $sender_id;
+public $sender_name;
+public $sender_type;
+public $sender_image;
+// public $senderId;
 
-public function __construct($message, $senderName, $senderType, $senderId, $receiverId,$senderImage)
+public $receiver_id; // تأكد من إضافة الخصائص المطلوبة
+
+public function __construct($message,$sender_name ,$sender_type ,$sender_id ,$receiver_id ,$sender_image)
 {
 $this->message = $message;
-$this->senderName = $senderName;
-$this->senderType = $senderType;
-$this->senderId = $senderId; // تعيين القيم للخصائص
-$this->receiverId = $receiverId; // تعيين القيم للخصائص
-$this->senderImage=$senderImage;
+$this->sender_name  = $sender_name ;
+$this->sender_type = $sender_type;
+$this->sender_id=$sender_id ; // تعيين القيم للخصائص
+$this->receiver_id = $receiver_id; // تعيين القيم للخصائص
+$this->sender_image=$sender_image;
 }
 
 public function broadcastOn(): array
 {
-$channelName = 'conversation.' . min($this->senderId, $this->receiverId) . '.' . max($this->senderId, $this->receiverId);
+$channelName = 'conversation.' . min($this->sender_id, $this->receiver_id) . '.' . max($this->sender_id, $this->receiver_id);
 return [new Channel($channelName)];
 }
 

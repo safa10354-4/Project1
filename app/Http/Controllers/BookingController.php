@@ -17,7 +17,6 @@ class BookingController extends Controller
 {
 
 
-
     public function bookTrip(Request $request,$tripId)
 
     {
@@ -104,7 +103,7 @@ class BookingController extends Controller
             'user_id' => $user['id'],
             'trip_id' => $trip->id,
             'payment_status' => 'paid',
-             'reservation_status' => 'booked_up',//محجوز
+            'reservation_status' => 'booked_up',//محجوز
             'booking_price' => $totalPrice,
 
         ]);
@@ -141,11 +140,11 @@ class BookingController extends Controller
         //*************************************************
 
 
-         $user1=User::query()->findOrFail($user['id']);
+        $user1=User::query()->findOrFail($user['id']);
 
-                 $user1['balance']= $wallet['balance'];
+        $user1['balance']= $wallet['balance'];
 
-                 $user1->save();
+        $user1->save();
 
 
 
@@ -161,10 +160,10 @@ class BookingController extends Controller
 
         return response()->json(['message' => 'The flight has been booked successfully',
 
-             'Booking price'=>$booking['booking_price'],
+            'Booking price'=>$booking['booking_price'],
 
 
-            ],200);
+        ],200);
 
 
 
@@ -176,18 +175,26 @@ class BookingController extends Controller
 
 
 
-  //Cancel your trip reservation
+    //Cancel your trip reservation
 
 
 
     public function cancelBooking($bookingId)
     {
+
         $booking = Booking::query()->findOrFail($bookingId);
 
         $trip = Trip::query()->findOrFail($booking['trip_id']);
 
 
-         $currentDate = now();
+
+        if ($booking['user_id'] !== auth()->id()) {
+            return response()->json(['message' => "You have no booking with ID $bookingId."], 403);
+
+        }
+
+
+        $currentDate = now();
         $bookingDate=$booking['created_at'];
         $tripStartDate = Carbon::parse($trip['trip_start_date']);
 
@@ -197,9 +204,12 @@ class BookingController extends Controller
 
         $percent=$damageTime/$Time_total;
 
+
+        $percent = round($percent, 1);
+
         $refundAmount = $booking['booking_price'] * $percent;
 
-         $oldPrice= $booking['booking_price'];
+        $oldPrice= $booking['booking_price'];
 
         $booking['reservation_status'] = 'cancelled'; //ملغي
         $booking['booking_price'] = $refundAmount;
@@ -210,17 +220,17 @@ class BookingController extends Controller
 
         $wallet = wallet::query()->where('user_id',$booking['user_id'])->first();
         $wallet->balance += $oldPrice-$refundAmount;
-         $wallet->save();
+        $wallet->save();
 
 
 
-         //==========================
+        //==========================
 
         $user=User::query()->findOrFail($booking['user_id']);
 
         $user['balance']= $wallet->balance;
 
-         $user->save();
+        $user->save();
 
 
 
@@ -228,11 +238,11 @@ class BookingController extends Controller
 
 
 
-          $trip['seats_available']= $trip['seats_available']+1;
+        $trip['seats_available']= $trip['seats_available']+1;
 
-            $trip->save();
+        $trip->save();
 
-         //********************************
+        //********************************
 
 
         Transaction::query()->create([
@@ -242,7 +252,16 @@ class BookingController extends Controller
             'type' => 1, // إعادة
         ]);
 
-        return response()->json(['message' => 'The reservation has been successfully cancelled, then 10% of the reservation price will be refunded to your balance'], 200);
+
+
+
+        return response()->json(['message' => 'The reservation has been successfully cancelled',
+
+
+            'Amount deducted from booking price'=> $booking['booking_price']
+
+
+        ], 200);
     }
 
 
@@ -255,14 +274,9 @@ class BookingController extends Controller
 
 
 
-
-    //   get all my reservation for the trip
-
-
     public function getAllMyBookings()
     {
         $user = auth()->user();
-
         $currentDate = now();
 
         $bookings = Booking::query()
@@ -271,19 +285,35 @@ class BookingController extends Controller
             ->whereHas('trip', function($query) use ($currentDate) {
                 $query->where('trip_start_date', '>', $currentDate);
             })
+            ->with(['trip' => function($query) {
+                $query->select('id', 'flight_name', 'location'); // جلب الحقول المطلوبة فقط من جدول trips
+            }])
             ->get();
 
         if ($bookings->isEmpty()) {
             return response()->json(['message' => 'You currently have no reservations'], 404);
         }
 
-        return response()->json($bookings, 200);
+        $result = $bookings->map(function ($booking) {
+            return [
+                'id' => $booking->id,
+                'payment_status' => $booking->payment_status,
+                'reservation_status' => $booking->reservation_status,
+                'rate' => $booking->rate,
+                'comment' => $booking->comment,
+                'booking_price' => $booking->booking_price,
+                'trip' => [
+                    'flight_name' => $booking->trip->flight_name,
+                    'location' => $booking->trip->location,
+                ],
+            ];
+        });
+
+        return response()->json($result, 200);
     }
 
 
 //============================================================================================
-
-
 
 
 

@@ -21,10 +21,18 @@ use App\Http\Controllers\AuthenController;
 Route::post('user/register',[AuthenController::class, 'userRegister']);
 Route::post('user/Login',[AuthenController::class, 'userLogin']);
 
+
 //Reset_password
 Route::post('user/password/email',[AuthenController::class,'UserForgotPassword']);
 Route::post('user/password/code/check',[AuthenController::class,'UserCheckCode']);
 Route::post('user/password/reset', [AuthenController::class,'UserResetPassword']);
+
+
+
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
 
 Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'] ],function() {
     Route::post('logout', [AuthenController::class, 'userLogout']);
@@ -34,10 +42,7 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('change',[ProflieController::class,'updatePassword']);
     Route::post('image',[ProflieController::class,'store1']);
 
-//Reset_password
-//    Route::post('user/password/email',[AuthenController::class,'UserForgotPassword']);
-//    Route::post('user/password/code/check',[AuthenController::class,'UserCheckCode']);
-//    Route::post('user/password/reset', [AuthenController::class,'UserResetPassword']);
+
     // get all trips
     Route::get('/getValidTrips',[TripUserController::class, 'getValidTrips']);
       //   get all optional  activities
@@ -52,6 +57,9 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('/cancelBooking/{bookingId}',[BookingController::class, 'cancelBooking']);
     //   get all my reservation for the trip
     Route::get('/getAllMyBookings',[BookingController::class, 'getAllMyBookings']);
+
+
+
 //    commentBooking
     Route::post('/commentBooking/{id}',[BookingController::class,'storeComment']);
     Route::post('/rateBooking/{id}',[BookingController::class,'StoreReview']);
@@ -75,8 +83,11 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
 //chat
     Route::post('/sendMessages', [ConversationController::class,'sendMessage']);
     Route::get('/getMessages/{id}', [ConversationController::class,'getMessages']);
+
+
+
     //UserTrip
-//    Route::get('/ShowTrips/{id}', [UserTripController::class,'show']);
+//  Route::get('/ShowTrips/{id}', [UserTripController::class,'show']);
     Route::get('/indexTrips', [UserTripController::class,'index']);
     Route::post('/StoreTrips', [UserTripController::class,'store']);
     Route::post('/UpdateTrips/{id}', [UserTripController::class,'update']);
@@ -86,5 +97,12 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('/StoreAct', [UserActivityController::class,'store']);
     Route::post('/UpdateAct/{id}', [UserActivityController::class,'update']);
     Route::post('/DestroyAct/{id}', [UserActivityController::class,'destroy']);
+
+
+
+    //create_device_token
+    Route::post('/create_device_token', [PushNotificationController::class, 'create_device_token']);
+
+
 
 });

@@ -195,8 +195,7 @@ class AuthenController extends Controller
 
     //***********************************************************************************************
 
-    public function UserForgotPassword(Request $request): Application|Response|\Illuminate\Contracts\Foundation\Application|ResponseFactory
-    {
+    public function UserForgotPassword(Request $request){
 
 
         $data=$request->validate([
@@ -230,8 +229,7 @@ class AuthenController extends Controller
 //========================================================================================================================
 
 
-    public function UserCheckCode(Request $request): Application|Response|\Illuminate\Contracts\Foundation\Application|ResponseFactory
-    {
+    public function UserCheckCode(Request $request){
         $request->validate([
             'code' => ['required','string','exists:reset_code_passwords'],
         ]);
@@ -256,8 +254,7 @@ class AuthenController extends Controller
     //===============================================================================================
 
 
-    public function UserResetPassword(Request $request): Application|Response|\Illuminate\Contracts\Foundation\Application|ResponseFactory
-    {
+    public function UserResetPassword(Request $request){
 
 
         $input=$request->validate([
